@@ -282,29 +282,160 @@
     @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
     @media (max-width: 1050px) { .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } .grid-2, .data-layout { grid-template-columns: 1fr; } }
-    @media (max-width: 760px) {
-      .app-shell { display: block; }
-      .sidebar { position: static; height: auto; padding: 14px 14px 12px; }
-      .brand { padding: 0 5px 12px; }
+    @media (max-width: 900px) {
+      .app-shell { display: block; padding-bottom: 0; }
+      .sidebar { position: static; height: auto; padding: 12px 14px 8px; }
+      .brand { padding: 0 2px 10px; }
       .side-label, .sidebar-spacer, .storage-card { display: none; }
-      .nav { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 2px; }
-      .nav button { width: auto; flex: 0 0 auto; padding: 9px 11px; font-size: 11px; }
-      .nav-icon { width: auto; }
-      .main { padding: 24px 15px 34px; }
-      .topbar, .dashboard-intro, .view-header { align-items: start; flex-direction: column; margin-bottom: 24px; }
-      .top-actions { width: 100%; justify-content: space-between; }
-      .date-chip { overflow: hidden; text-overflow: ellipsis; }
-      .kpi-grid { gap: 8px; }
-      .kpi { min-height: 108px; padding: 14px; }
-      .kpi-value { font-size: 30px; }
-      .panel-header, .panel-body { padding-left: 14px; padding-right: 14px; }
-      .table-wrap { overflow-x: auto; }
-      .table { min-width: 650px; }
-      .calendar-grid { min-width: 680px; }
-      .calendar-wrap { overflow-x: auto; padding-bottom: 5px; }
+
+      /* bottom tab bar instead of a scrolling strip */
+      .nav {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 12;
+        display: grid; grid-template-columns: repeat(7, 1fr); gap: 0;
+        margin: 0; padding: 4px 2px calc(4px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line); background: var(--paper);
+        box-shadow: 0 -4px 18px rgba(24,47,62,.10);
+      }
+      .nav button {
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+        width: 100%; min-height: 50px; padding: 5px 1px; border-radius: 8px;
+        font-size: 9px; line-height: 1.1; letter-spacing: 0; text-align: center;
+      }
+      .nav button span:not(.nav-icon) { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
+      .nav-icon { width: auto; font-size: 16px; }
+
+      .main { padding: 16px 13px 84px; }
+      .topbar, .dashboard-intro, .view-header { align-items: stretch; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+      .top-actions { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+      .top-actions .primary-btn { flex: 1 1 100%; order: 3; }
+      .date-chip { flex: 1 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .page-title { font-size: 24px; }
+      .view-header p { font-size: 12px; }
+
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+      .kpi { min-height: 92px; padding: 13px; }
+      .kpi-value { font-size: 26px; }
+      .panel-header { flex-direction: column; align-items: stretch; gap: 10px; }
+      .panel-header, .panel-body { padding-left: 13px; padding-right: 13px; }
+
+      /* filters stack, never overflow */
+      .filter-bar { display: grid; grid-template-columns: 1fr; gap: 8px; }
+      .filter-bar .field, .filter-bar .select, .filter-bar .ghost-btn { width: 100%; min-width: 0; }
+      .data-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+      .data-actions .ghost-btn { flex: 1 1 calc(50% - 4px); min-width: 0; font-size: 11px; padding: 9px 6px; }
+      .month-nav { flex: 1 1 100%; justify-content: space-between; }
+
+      /* TABLES -> CARDS (no horizontal scrolling) */
+      .table-wrap { overflow: visible; }
+      .table, .table tbody, .table tr, .table td { display: block; width: 100%; min-width: 0; }
+      .table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      .table tr {
+        position: relative; margin-bottom: 9px; padding: 13px 13px 11px;
+        border: 1px solid var(--line); border-radius: 4px; background: var(--paper);
+      }
+      .table td { padding: 3px 0; border: 0; }
+      .table td:first-child, .table td:last-child { padding-left: 0; padding-right: 0; }
+      .table td[data-label]::before {
+        display: block; margin-bottom: 2px;
+        color: var(--muted); font-size: 9px; letter-spacing: .09em; text-transform: uppercase;
+        content: attr(data-label);
+      }
+      .table td.cell-title::before { display: none; }
+      .table td.cell-actions { margin-top: 8px; padding-top: 9px; border-top: 1px solid var(--line); }
+      .table td.cell-actions::before { display: none; }
+      .table .action-cell { justify-content: flex-start; }
+      .table tr.is-empty { padding: 0; border: 0; background: none; }
+
+      /* month calendar: compact, fits the viewport */
+      .calendar-wrap { overflow: visible; padding-bottom: 0; }
+      .calendar-grid { min-width: 0; }
+      .calendar-cell { min-height: 58px; padding: 4px 3px; }
+      .calendar-head { padding: 6px 2px; font-size: 9px; }
+      .day-number { font-size: 11px; }
+      .calendar-cell .cal-event {
+        display: block; overflow: hidden; height: 5px; margin-top: 2px; padding: 0;
+        border-radius: 3px; font-size: 0; text-indent: -999px;
+      }
+      .calendar-cell .cal-more { font-size: 8px; }
+
+      /* rows */
+      .event-row, .content-row, .meeting-row, .idea-row { grid-template-columns: 1fr; gap: 6px; }
+      .event-actions, .idea-actions { flex-wrap: wrap; justify-content: flex-start; }
+
+      /* MODALS: full screen sheets */
+      .modal-backdrop { padding: 0; place-items: stretch; }
+      .modal-backdrop.open { display: block; }
+      .modal {
+        display: flex; flex-direction: column;
+        width: 100%; max-width: none; height: 100%; max-height: none;
+        border: 0; border-radius: 0;
+      }
+      .modal-head { padding: calc(16px + env(safe-area-inset-top)) 16px 12px; }
+      .modal-body { flex: 1 1 auto; overflow-y: auto; padding: 0 16px 16px; -webkit-overflow-scrolling: touch; }
+      .modal-footer {
+        position: sticky; bottom: 0; z-index: 2;
+        gap: 8px; margin: 0 -16px -16px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line); background: var(--paper);
+      }
+      .modal-footer .primary-btn, .modal-footer .ghost-btn { flex: 1 1 0; }
       .form-grid { grid-template-columns: 1fr; }
       .form-field.full { grid-column: auto; }
+      .rec-row { grid-template-columns: 1fr; }
+
+      /* iOS zooms in on inputs smaller than 16px */
+      input, select, textarea, .field, .select { font-size: 16px; }
+      .data-preview { font-size: 10px; }
+      .toast { right: 12px; left: 12px; bottom: calc(70px + env(safe-area-inset-bottom)); max-width: none; }
+      .folder-bar { flex-wrap: wrap; }
     }
+    @media (max-width: 400px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .nav button { font-size: 8px; }
+      .calendar-cell { min-height: 50px; }
+    }
+
+    /* ---- calendar view modes ---- */
+    .cal-modes { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 4px; background: #EDF3F4; }
+    .cal-modes button {
+      padding: 7px 14px; border: 0; border-radius: 3px; background: transparent;
+      color: var(--muted); font: inherit; font-size: 11px; font-weight: 600; letter-spacing: .04em; cursor: pointer;
+    }
+    .cal-modes button.active { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(24,47,62,.14); }
+    .cal-modes button:focus-visible { outline: 2px solid var(--cadenabbia); outline-offset: 1px; }
+    .day-strip { display: flex; flex-direction: column; gap: 8px; }
+    .day-group { border: 1px solid var(--line); border-radius: 4px; background: var(--paper); }
+    .day-group.is-today { border-color: var(--cadenabbia); box-shadow: inset 3px 0 0 var(--cadenabbia); }
+    .day-group-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+      padding: 10px 13px; border-bottom: 1px solid var(--line);
+    }
+    .day-group-head strong { font-size: 13px; }
+    .day-group-head .day-count { color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+    .day-group-body { display: flex; flex-direction: column; gap: 6px; padding: 10px 13px; }
+    .day-group-body:empty::after { color: var(--muted); font-size: 11px; content: attr(data-empty); }
+    .day-item {
+      display: flex; align-items: center; gap: 9px; width: 100%; padding: 9px 10px;
+      border: 1px solid var(--line); border-radius: 3px; background: #F7FAFB;
+      font: inherit; text-align: left; cursor: pointer;
+    }
+    .day-item:hover, .day-item:focus-visible { border-color: var(--cadenabbia); outline: none; }
+    .day-item .dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: var(--cadenabbia); }
+    .day-item .dot.holiday { background: #E1A100; }
+    .day-item .dot.meeting { background: #7A5AA8; }
+    .day-item .t { flex: 1 1 auto; min-width: 0; overflow: hidden; font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+    .day-item .m { flex: 0 0 auto; color: var(--muted); font-size: 10px; }
+    .range-label { font-size: 12px; font-weight: 600; }
+
+    /* ---- storage health ---- */
+    .storage-flag { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 3px; font-size: 11px; }
+    .storage-flag.ok { background: #E4F5F0; color: #14684F; }
+    .storage-flag.warn { background: #FDF0DA; color: #8A5A00; }
+    .backup-banner {
+      display: none; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 14px; padding: 11px 14px; border: 1px solid #E8C97A; border-radius: 4px;
+      background: #FDF6E5; color: #6B4E00; font-size: 12px;
+    }
+    .backup-banner.show { display: flex; }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
   
     /* ---- CDU CD layer ------------------------------------------------ */
@@ -415,7 +546,7 @@
         <div class="top-actions"><select class="language-select" id="language-select" aria-label="Язык"><option value="ru">RU</option><option value="de">DE</option></select><div class="date-chip" id="today-chip"></div><button class="primary-btn" data-action="quick-add" data-i18n="actions.add">＋ Добавить</button></div>
       </header>
 
-      <section class="view active" id="view-overview" aria-labelledby="page-title">
+      <div class="backup-banner" id="backup-banner" role="status"><span id="backup-banner-text"></span><span style="display:flex;gap:7px"><button class="primary-btn" data-action="export" data-i18n="backup.now">Экспортировать</button><button class="ghost-btn" data-action="dismiss-backup" data-i18n="backup.later">Позже</button></span></div><section class="view active" id="view-overview" aria-labelledby="page-title">
         <div class="dashboard-intro"><div><div class="eyebrow">Ваш рабочий ритм</div><p>Одна спокойная панель для задач, контент-плана и договорённостей команды. Ничего не отправляется наружу.</p></div><button class="ghost-btn" data-action="quick-add">＋ Новая запись</button></div>
         <div class="kpi-grid">
           <article class="kpi"><div class="kpi-label">Открытые задачи</div><div class="kpi-value" id="kpi-open">0</div><div class="kpi-caption">в текущем рабочем пространстве</div></article>
@@ -466,14 +597,14 @@
       <section class="view" id="view-calendar">
         <div class="view-header"><div><div class="eyebrow" data-i18n="calendar.eyebrow">Локальный календарь</div><h2 class="page-title" data-i18n="calendar.title">Календарь</h2><p data-i18n="calendar.intro">Импортируйте Outlook, праздники и задачи пакетно — без API и без отправки данных наружу.</p></div><button class="primary-btn" data-action="add-event" data-i18n="calendar.addEvent">＋ Новое событие</button></div>
         <div class="filter-bar"><input class="field" id="event-search" type="search" placeholder="Поиск по событиям…" aria-label="Поиск по событиям"><select class="select" id="event-type-filter" aria-label="Тип события"><option value="all">Все типы</option><option value="event">Событие</option><option value="meeting">Встреча</option><option value="task">Задача</option><option value="holiday">Праздник</option><option value="absence">Отсутствие</option><option value="reminder">Напоминание</option></select><select class="select" id="event-source-filter" aria-label="Источник"><option value="all">Все источники</option><option value="manual">Вручную</option><option value="outlook">Outlook / ICS</option><option value="todo">Microsoft To Do</option><option value="holiday-pack">Пакет праздников</option></select><select class="select" id="event-category-filter" aria-label="Категория"><option value="all">Все категории</option><option value="work">Работа</option><option value="social">Социальные медиа</option><option value="regional">Региональные даты</option><option value="personal">Личное</option></select><button class="ghost-btn" data-action="reset-event-filters" data-i18n="actions.reset">Сбросить</button></div>
-        <section class="panel"><div class="panel-header"><div><h2 class="panel-title" data-i18n="calendar.monthView">Календарь событий</h2><div class="panel-subtitle" id="event-calendar-caption"></div></div><div class="data-actions"><div class="month-nav"><button data-month-shift="-1" aria-label="Предыдущий месяц">‹</button><span class="month-label" id="event-month-label"></span><button data-month-shift="1" aria-label="Следующий месяц">›</button><button data-month-shift="0" aria-label="Текущий месяц">•</button></div><button class="ghost-btn" data-action="import-ics" data-i18n="calendar.importIcs">↧ Импорт ICS</button><button class="ghost-btn" data-action="import-csv" data-i18n="calendar.importCsv">↧ Импорт CSV</button><button class="ghost-btn" data-action="export-ics" data-i18n="calendar.exportIcs">↥ Экспорт ICS</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить</button></div></div><div class="calendar-wrap"><div class="calendar-grid" id="event-calendar-grid"></div></div><div class="calendar-import-preview" id="calendar-import-preview"></div></section>
+        <section class="panel"><div class="panel-header"><div><h2 class="panel-title" data-i18n="calendar.monthView">Календарь событий</h2><div class="panel-subtitle" id="event-calendar-caption"></div></div><div class="data-actions"><div class="cal-modes" role="group" data-i18n-aria="calendar.modeGroup" aria-label="Режим календаря"><button type="button" data-cal-mode="day" data-i18n="calendar.modeDay">День</button><button type="button" data-cal-mode="week" data-i18n="calendar.modeWeek">Неделя</button><button type="button" class="active" data-cal-mode="month" data-i18n="calendar.modeMonth">Месяц</button></div><div class="month-nav"><button data-month-shift="-1" data-i18n-aria="calendar.prev" aria-label="Назад">‹</button><span class="month-label" id="event-month-label"></span><button data-month-shift="1" data-i18n-aria="calendar.next" aria-label="Вперёд">›</button><button data-month-shift="0" data-i18n-aria="calendar.today" aria-label="Сегодня">•</button></div><button class="ghost-btn" data-action="import-ics" data-i18n="calendar.importIcs">↧ Импорт ICS</button><button class="ghost-btn" data-action="import-csv" data-i18n="calendar.importCsv">↧ Импорт CSV</button><button class="ghost-btn" data-action="export-ics" data-i18n="calendar.exportIcs">↥ Экспорт ICS</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить</button></div></div><div class="calendar-wrap" id="event-calendar-wrap"><div class="calendar-grid" id="event-calendar-grid"></div></div><div class="day-strip" id="event-day-strip" hidden></div><div class="calendar-import-preview" id="calendar-import-preview"></div></section>
         <div style="height:16px"></div>
         <section class="panel"><div class="panel-header"><div><h2 class="panel-title" data-i18n="calendar.eventList">События выбранного месяца</h2><div class="panel-subtitle" data-i18n="calendar.eventListSub">Справочный список календаря. Задачи создаются только по вашему явному действию.</div></div></div><div class="panel-body"><div class="event-list" id="event-list"></div></div></section>
       </section>
 
       <section class="view" id="view-data">
         <div class="view-header"><div><div class="eyebrow">Локальное хранение</div><h2 class="page-title">Данные</h2><p>Переносите рабочее пространство между компьютерами через один JSON-файл.</p></div></div>
-        <div class="data-layout"><section class="data-card"><h3>Ручная синхронизация</h3><p>Приложение не подключается к API и не отправляет данные в интернет. Экспортируйте файл в общую папку OneDrive и импортируйте актуальную версию перед началом работы.</p><div class="data-actions"><button class="primary-btn" data-action="export">↥ Экспортировать JSON</button><button class="ghost-btn" data-action="import">↧ Импортировать JSON</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить календарь</button><button class="ghost-btn" data-action="reset-workspace">↺ Сбросить всё</button></div><div class="notice">Совет: перед импортом сохраните собственный экспорт. При одновременной работе сотрудников используйте договорённость «один редактор — одна версия файла».</div></section><section class="data-card"><h3>Текущее содержимое</h3><p>Предпросмотр локального набора данных.</p><pre class="data-preview" id="data-preview"></pre></section></div>
+        <div class="data-layout"><section class="data-card"><h3>Ручная синхронизация</h3><p>Приложение не подключается к API и не отправляет данные в интернет. Экспортируйте файл в общую папку OneDrive и импортируйте актуальную версию перед началом работы.</p><div class="data-actions"><button class="primary-btn" data-action="export">↥ Экспортировать JSON</button><button class="ghost-btn" data-action="import">↧ Импортировать JSON</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить календарь</button><button class="ghost-btn" data-action="reset-workspace">↺ Сбросить всё</button></div><div class="notice">Совет: перед импортом сохраните собственный экспорт. При одновременной работе сотрудников используйте договорённость «один редактор — одна версия файла».</div></section><section class="data-card"><h3 data-i18n="storage.health">Надёжность хранения</h3><p id="storage-health-note" data-i18n="storage.note">Проверка…</p><div class="data-actions"><span class="storage-flag warn" id="storage-flag">…</span><button class="ghost-btn" data-action="request-persist" data-i18n="storage.request">Закрепить хранилище</button><button class="ghost-btn" data-action="restore-snapshot" data-i18n="storage.restore">Восстановить из снимка</button></div></section><section class="data-card"><h3>Текущее содержимое</h3><p>Предпросмотр локального набора данных.</p><pre class="data-preview" id="data-preview"></pre></section></div>
       </section>
     </main>
   </div>
@@ -490,6 +621,150 @@
       'use strict';
       const DAY_CODES = ['MO','TU','WE','TH','FR','SA','SU'];
       const STORAGE_KEY = 'social-desk-local-v1';
+      const SNAPSHOT_KEY = 'social-desk-snapshots-v1';
+      const LASTEXPORT_KEY = 'social-desk-last-export';
+      const BACKUP_DISMISS_KEY = 'social-desk-backup-dismissed';
+      const IDB_NAME = 'social-desk';
+      const IDB_STORE = 'state';
+      const SNAPSHOT_MAX = 5;
+      const BACKUP_REMIND_DAYS = 7;
+      let idbReady = null;
+      let storagePersisted = null;
+
+      function idb() {
+        if (idbReady) return idbReady;
+        idbReady = new Promise((resolve) => {
+          try {
+            if (typeof indexedDB === 'undefined') { resolve(null); return; }
+            const req = indexedDB.open(IDB_NAME, 1);
+            req.onupgradeneeded = () => { const db = req.result; if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE); };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+            req.onblocked = () => resolve(null);
+          } catch (e) { resolve(null); }
+        });
+        return idbReady;
+      }
+      function idbPut(key, value) {
+        return idb().then(db => {
+          if (!db) return false;
+          return new Promise((resolve) => {
+            try {
+              const tx = db.transaction(IDB_STORE, 'readwrite');
+              tx.objectStore(IDB_STORE).put(value, key);
+              tx.oncomplete = () => resolve(true);
+              tx.onerror = () => resolve(false);
+              tx.onabort = () => resolve(false);
+            } catch (e) { resolve(false); }
+          });
+        });
+      }
+      function idbGet(key) {
+        return idb().then(db => {
+          if (!db) return null;
+          return new Promise((resolve) => {
+            try {
+              const tx = db.transaction(IDB_STORE, 'readonly');
+              const r = tx.objectStore(IDB_STORE).get(key);
+              r.onsuccess = () => resolve(r.result ?? null);
+              r.onerror = () => resolve(null);
+            } catch (e) { resolve(null); }
+          });
+        });
+      }
+      function writeState(obj) {
+        const json = JSON.stringify(obj);
+        let localOk = true;
+        try { localStorage.setItem(STORAGE_KEY, json); } catch (e) { localOk = false; }
+        idbPut(STORAGE_KEY, json).then(ok => { if (!ok && !localOk) showToast(lang === 'de' ? 'Speichern fehlgeschlagen' : 'Не удалось сохранить'); });
+        return localOk;
+      }
+      function pushSnapshot(obj) {
+        try {
+          const list = JSON.parse(localStorage.getItem(SNAPSHOT_KEY) || '[]');
+          const last = list[list.length - 1];
+          const now = Date.now();
+          if (last && now - last.at < 6 * 60 * 60 * 1000) return;
+          list.push({ at: now, data: JSON.stringify(obj) });
+          while (list.length > SNAPSHOT_MAX) list.shift();
+          localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(list));
+          idbPut(SNAPSHOT_KEY, JSON.stringify(list));
+        } catch (e) { /* snapshots are best effort */ }
+      }
+      function listSnapshots() {
+        try { return JSON.parse(localStorage.getItem(SNAPSHOT_KEY) || '[]'); } catch (e) { return []; }
+      }
+      function requestPersistentStorage() {
+        if (typeof navigator === 'undefined' || !navigator.storage || !navigator.storage.persist) {
+          storagePersisted = false; renderStorageHealth(); return Promise.resolve(false);
+        }
+        return navigator.storage.persist().then(granted => {
+          storagePersisted = !!granted; renderStorageHealth();
+          showToast(granted
+            ? (lang === 'de' ? 'Speicher als dauerhaft markiert' : 'Хранилище закреплено')
+            : (lang === 'de' ? 'Browser hat dauerhaften Speicher abgelehnt' : 'Браузер отказал в закреплении'));
+          return storagePersisted;
+        }).catch(() => { storagePersisted = false; renderStorageHealth(); return false; });
+      }
+      function checkPersistence() {
+        if (typeof navigator === 'undefined' || !navigator.storage || !navigator.storage.persisted) { storagePersisted = false; renderStorageHealth(); return; }
+        navigator.storage.persisted().then(p => {
+          storagePersisted = !!p;
+          renderStorageHealth();
+          if (!p && navigator.storage.persist) navigator.storage.persist().then(g => { storagePersisted = !!g; renderStorageHealth(); }).catch(() => {});
+        }).catch(() => { storagePersisted = false; renderStorageHealth(); });
+      }
+      function daysSinceExport() {
+        const raw = localStorage.getItem(LASTEXPORT_KEY);
+        if (!raw) return null;
+        return Math.floor((Date.now() - Number(raw)) / 86400000);
+      }
+      function renderStorageHealth() {
+        const flag = $('#storage-flag'); if (!flag) return;
+        const de = lang === 'de';
+        const persisted = storagePersisted === true;
+        flag.className = 'storage-flag ' + (persisted ? 'ok' : 'warn');
+        flag.textContent = persisted
+          ? (de ? 'Speicher: dauerhaft' : 'Хранилище: постоянное')
+          : (de ? 'Speicher: temporär' : 'Хранилище: временное');
+        const d = daysSinceExport();
+        const note = $('#storage-health-note');
+        if (note) {
+          const snaps = listSnapshots().length;
+          const exportLine = d === null
+            ? (de ? 'Noch kein Export erstellt.' : 'Экспорт ещё не делался.')
+            : (de ? 'Letzter Export vor ' + d + ' Tag(en).' : 'Последний экспорт ' + d + ' дн. назад.');
+          note.textContent = (de
+            ? 'Daten liegen in IndexedDB und im localStorage dieses Geräts. Snapshots: ' + snaps + '. '
+            : 'Данные хранятся в IndexedDB и localStorage этого устройства. Снимков: ' + snaps + '. ') + exportLine;
+        }
+        renderBackupBanner();
+      }
+      function renderBackupBanner() {
+        const el = $('#backup-banner'); if (!el) return;
+        const d = daysSinceExport();
+        const dismissed = Number(localStorage.getItem(BACKUP_DISMISS_KEY) || 0);
+        const recentlyDismissed = Date.now() - dismissed < 3 * 86400000;
+        const hasData = state && (state.tasks.length || state.events.length || state.ideas.length || state.content.length);
+        const stale = hasData && (d === null || d >= BACKUP_REMIND_DAYS);
+        el.classList.toggle('show', !!stale && !recentlyDismissed);
+        const txt = $('#backup-banner-text');
+        if (txt) txt.textContent = lang === 'de'
+          ? (d === null ? 'Sie haben noch kein Backup exportiert. Ein Browser kann lokale Daten löschen.' : 'Letzter Export vor ' + d + ' Tagen. Zeit für ein Backup.')
+          : (d === null ? 'Резервная копия ещё не сохранялась. Браузер может удалить локальные данные.' : 'Последний экспорт ' + d + ' дн. назад. Пора сделать копию.');
+      }
+      function restoreFromSnapshot() {
+        const list = listSnapshots();
+        if (!list.length) { showToast(lang === 'de' ? 'Keine Snapshots vorhanden' : 'Снимков нет'); return; }
+        const s = list[list.length - 1];
+        const when = new Date(s.at).toLocaleString(lang === 'de' ? 'de-DE' : 'ru-RU');
+        if (!confirm((lang === 'de' ? 'Snapshot vom ' : 'Восстановить снимок от ') + when + (lang === 'de' ? ' wiederherstellen? Aktuelle Daten werden ersetzt.' : '? Текущие данные будут заменены.'))) return;
+        try {
+          state = { ...initialState(), ...JSON.parse(s.data) };
+          persist();
+          showToast(lang === 'de' ? 'Snapshot wiederhergestellt' : 'Снимок восстановлен');
+        } catch (e) { showToast(lang === 'de' ? 'Snapshot beschädigt' : 'Снимок повреждён'); }
+      }
       const LANGUAGE_KEY = 'social-desk-language';
       const IDEA_STATUSES = ['idea','progress','ready','archived'];
       const DEFAULT_CHANNELS = ['LinkedIn','Instagram','Internal','Website'];
@@ -498,6 +773,8 @@
       let toastTimer = null;
       let importBuffer = [];
       let eventCursor = new Date();
+      const CALMODE_KEY = 'social-desk-cal-mode';
+      let calMode = (function () { try { const m = localStorage.getItem(CALMODE_KEY); return ['day','week','month'].includes(m) ? m : 'month'; } catch (e) { return 'month'; } })();
       let editingTaskId = null;
       let editingEventId = null;
       let contentCursor = new Date();
@@ -506,14 +783,15 @@
       const translations = {
         ru: {
           'app.eyebrow':'Социальные медиа · control room', 'nav.overview':'Обзор', 'nav.tasks':'Задачи', 'nav.content':'Контент', 'nav.meetings':'Встречи', 'nav.calendar':'Календарь', 'nav.ideas':'Идеи', 'ideas.eyebrow':'Банк идей', 'ideas.title':'Идеи контента', 'ideas.intro':'Складывайте идеи в папки. Связь с календарём — только вручную.', 'ideas.add':'＋ Новая идея', 'ideas.folders':'Папки', 'ideas.foldersSub':'Один уровень. Удаление папки не удаляет идеи.', 'ideas.list':'Идеи', 'ideas.channels':'Каналы', 'ideas.channelsSub':'Список редактируемый: добавляйте, переименовывайте и удаляйте каналы.', 'ideas.disk':'Папка на диске', 'ideas.diskSub':'Подключите папку один раз — приложение создаст подпапку для каждой идеи с заметками и вложениями.', 'nav.data':'Данные', 'actions.add':'＋ Добавить', 'actions.reset':'Сбросить',
-          'calendar.eyebrow':'Локальный календарь', 'calendar.title':'Календарь', 'calendar.intro':'Импортируйте Outlook, праздники и задачи пакетно — без API и без отправки данных наружу.', 'calendar.addEvent':'＋ Новое событие', 'calendar.importIcs':'↧ Импорт ICS', 'calendar.importCsv':'↧ Импорт CSV', 'calendar.exportIcs':'↥ Экспорт ICS', 'calendar.monthView':'Календарь событий', 'calendar.eventList':'Список событий', 'calendar.eventListSub':'Откройте событие, чтобы создать задачу или запланировать дальнейшее действие.'
+          'calendar.eyebrow':'Локальный календарь', 'calendar.title':'Календарь', 'calendar.intro':'Импортируйте Outlook, праздники и задачи пакетно — без API и без отправки данных наружу.', 'calendar.addEvent':'＋ Новое событие', 'calendar.importIcs':'↧ Импорт ICS', 'calendar.importCsv':'↧ Импорт CSV', 'calendar.exportIcs':'↥ Экспорт ICS', 'calendar.monthView':'Календарь событий', 'calendar.eventList':'Список событий', 'calendar.eventListSub':'Откройте событие, чтобы создать задачу или запланировать дальнейшее действие.', 'calendar.modeGroup':'Режим календаря', 'calendar.prev':'Назад', 'calendar.next':'Вперёд', 'calendar.today':'Сегодня', 'calendar.modeDay':'День', 'calendar.modeWeek':'Неделя', 'calendar.modeMonth':'Месяц', 'backup.now':'Экспортировать', 'backup.later':'Позже', 'storage.health':'Надёжность хранения', 'storage.note':'Проверка…', 'storage.request':'Закрепить хранилище', 'storage.restore':'Восстановить из снимка'
         },
         de: {
           'app.eyebrow':'Social Media · Control Room', 'nav.overview':'Übersicht', 'nav.tasks':'Aufgaben', 'nav.content':'Content', 'nav.meetings':'Meetings', 'nav.calendar':'Kalender', 'nav.ideas':'Ideen', 'ideas.eyebrow':'Ideenspeicher', 'ideas.title':'Content-Ideen', 'ideas.intro':'Ideen in Ordnern sammeln. Kalenderverknüpfung nur manuell.', 'ideas.add':'＋ Neue Idee', 'ideas.folders':'Ordner', 'ideas.foldersSub':'Eine Ebene. Das Löschen eines Ordners löscht keine Ideen.', 'ideas.list':'Ideen', 'ideas.channels':'Kanäle', 'ideas.channelsSub':'Die Liste ist bearbeitbar: Kanäle hinzufügen, umbenennen und entfernen.', 'ideas.disk':'Ordner auf der Festplatte', 'ideas.diskSub':'Ordner einmal verbinden — die Anwendung legt für jede Idee einen Unterordner mit Notizen und Anhängen an.', 'nav.data':'Daten', 'actions.add':'＋ Hinzufügen', 'actions.reset':'Zurücksetzen',
-          'calendar.eyebrow':'Lokaler Kalender', 'calendar.title':'Kalender', 'calendar.intro':'Outlook, Feiertage und Aufgaben gesammelt importieren — ohne API und ohne Datenübertragung.', 'calendar.addEvent':'＋ Neues Ereignis', 'calendar.importIcs':'↧ ICS importieren', 'calendar.importCsv':'↧ CSV importieren', 'calendar.exportIcs':'↥ ICS exportieren', 'calendar.monthView':'Ereigniskalender', 'calendar.eventList':'Ereignisliste', 'calendar.eventListSub':'Ereignis öffnen, Aufgabe erstellen oder nächste Aktion planen.'
+          'calendar.eyebrow':'Lokaler Kalender', 'calendar.title':'Kalender', 'calendar.intro':'Outlook, Feiertage und Aufgaben gesammelt importieren — ohne API und ohne Datenübertragung.', 'calendar.addEvent':'＋ Neues Ereignis', 'calendar.importIcs':'↧ ICS importieren', 'calendar.importCsv':'↧ CSV importieren', 'calendar.exportIcs':'↥ ICS exportieren', 'calendar.monthView':'Ereigniskalender', 'calendar.eventList':'Ereignisliste', 'calendar.eventListSub':'Ereignis öffnen, Aufgabe erstellen oder nächste Aktion planen.', 'calendar.modeGroup':'Kalenderansicht', 'calendar.prev':'Zurück', 'calendar.next':'Weiter', 'calendar.today':'Heute', 'calendar.modeDay':'Tag', 'calendar.modeWeek':'Woche', 'calendar.modeMonth':'Monat', 'backup.now':'Exportieren', 'backup.later':'Später', 'storage.health':'Speichersicherheit', 'storage.note':'Prüfung…', 'storage.request':'Speicher dauerhaft machen', 'storage.restore':'Aus Snapshot wiederherstellen'
         }
       };
       const ruDeText = {
+        'Режим календаря':'Kalenderansicht','Назад':'Zurück','Вперёд':'Weiter','Сегодня':'Heute','Надёжность хранения':'Speichersicherheit','Закрепить хранилище':'Speicher dauerhaft machen','Восстановить из снимка':'Aus Snapshot wiederherstellen','Экспортировать':'Exportieren','Позже':'Später','Проверка…':'Prüfung…','День':'Tag','Неделя':'Woche','Месяц':'Monat',
         'Каналы':'Kanäle','Название канала':'Kanalname','Список редактируемый: добавляйте, переименовывайте и удаляйте каналы.':'Die Liste ist bearbeitbar: Kanäle hinzufügen, umbenennen und entfernen.','Папка на диске':'Ordner auf der Festplatte','Подключите папку один раз — приложение создаст подпапку для каждой идеи с заметками и вложениями.':'Ordner einmal verbinden — die Anwendung legt für jede Idee einen Unterordner mit Notizen und Anhängen an.','Подключить папку':'Ordner verbinden','Синхронизировать всё':'Alles synchronisieren','Выгрузить идеи':'Ideen exportieren','Папка не подключена':'Kein Ordner verbunden','Файлы и ссылки':'Dateien und Links','Чек-лист':'Checkliste','Добавить шаг':'Schritt hinzufügen','Сохранить на диск':'Auf Festplatte speichern','Канал добавлен':'Kanal hinzugefügt','Канал удалён':'Kanal entfernt','Канал переименован':'Kanal umbenannt','Идеи выгружены':'Ideen exportiert','Сохранено на диск':'Auf Festplatte gespeichert',
         'Поиск по идеям…':'Ideen durchsuchen…','Поиск по идеям':'Ideen durchsuchen','Фильтр по статусу идеи':'Filter nach Ideenstatus','Название папки':'Ordnername','Банк идей':'Ideenspeicher','Идеи контента':'Content-Ideen','Складывайте идеи в папки. Связь с календарём — только вручную.':'Ideen in Ordnern sammeln. Kalenderverknüpfung nur manuell.','Новая идея':'Neue Idee','Один уровень. Удаление папки не удаляет идеи.':'Eine Ebene. Das Löschen eines Ordners löscht keine Ideen.','Папки':'Ordner','Идеи':'Ideen','Все идеи':'Alle Ideen','Без папки':'Ohne Ordner','Идей пока нет':'Noch keine Ideen','Добавьте первую идею, чтобы собрать банк тем.':'Fügen Sie die erste Idee hinzu, um den Themenspeicher aufzubauen.','Готова':'Fertig','В архиве':'Archiviert','Заметки':'Notizen','Теги':'Tags','Папка':'Ordner','Связанное событие':'Verknüpftes Ereignis','Без связи':'Ohne Verknüpfung','Создать событие':'Ereignis erstellen','Удалить идею':'Idee löschen','Теги через запятую':'Tags durch Komma getrennt','Идея сохранена':'Idee gespeichert','Идея удалена':'Idee gelöscht','Папка создана':'Ordner angelegt','Папка переименована':'Ordner umbenannt','Папка удалена':'Ordner gelöscht','Событие создано из идеи':'Ereignis aus Idee erstellt','Задача создана из идеи':'Aufgabe aus Idee erstellt','История':'Verlauf','Пусто':'Leer',
         'Предыдущий месяц':'Voriger Monat','Следующий месяц':'Nächster Monat','Текущий месяц':'Aktueller Monat','События выбранного месяца':'Ereignisse des gewählten Monats','Справочный список календаря. Задачи создаются только по вашему явному действию.':'Referenzliste des Kalenders. Aufgaben entstehen nur durch Ihre ausdrückliche Aktion.','в этом месяце':'im Monat','всего в календаре':'insgesamt im Kalender','В этом месяце событий нет':'Keine Ereignisse in diesem Monat','Смените месяц, сбросьте фильтры или импортируйте ICS/CSV.':'Monat wechseln, Filter zurücksetzen oder ICS/CSV importieren.','Импорт завершён':'Import abgeschlossen','Прочитано из файла':'Aus Datei gelesen','Добавлено в календарь':'In den Kalender übernommen','Пропущено как дубликат':'Als Duplikat übersprungen','Всего событий в календаре':'Ereignisse im Kalender gesamt','Импортировано в календарь: ':'In den Kalender importiert: ',
@@ -638,7 +916,8 @@
       }
       function persist() {
         state.updatedAt = new Date().toISOString();
-        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { showToast('Браузер не разрешил локальное сохранение'); }
+        if (!writeState(state)) showToast(lang === 'de' ? 'Browser erlaubt kein lokales Speichern' : 'Браузер не разрешил локальное сохранение');
+        pushSnapshot(state);
         renderAll();
       }
       function showToast(message) {
@@ -684,7 +963,7 @@
       function renderTasks() {
         const search = ($('#task-search')?.value || '').toLowerCase(); const status = $('#task-status-filter')?.value || 'all'; const priority = $('#task-priority-filter')?.value || 'all';
         const rows = state.tasks.filter(t => (!search || [t.title,t.owner,t.area,t.notes].join(' ').toLowerCase().includes(search)) && (status === 'all' || t.status === status) && (priority === 'all' || t.priority === priority)).sort((a,b) => sortByDate(a,b,'due'));
-        $('#tasks-table').innerHTML = rows.length ? rows.map(t => '<tr><td><div class="row-title">' + escapeHtml(t.title) + '</div><div class="row-note">' + escapeHtml(t.area || 'Общее') + (t.owner ? ' · ' + escapeHtml(t.owner) : '') + '</div></td><td><span class="status-pill status-' + t.status + '">' + ({todo:'К выполнению',progress:'В работе',done:'Готово',blocked:'Заблокировано'}[t.status]) + '</span></td><td>' + formatDate(t.due, {day:'numeric',month:'short',year:'numeric'}) + '</td><td><span class="priority ' + t.priority + '">' + ({high:'Высокий',medium:'Средний',low:'Низкий'}[t.priority]) + '</span></td><td><div class="action-cell"><button class="mini-btn" title="Открыть" data-task-open="' + t.id + '">✎</button><button class="mini-btn" title="Изменить статус" data-task-toggle="' + t.id + '">✓</button><button class="mini-btn" title="Удалить" data-delete-type="tasks" data-delete-id="' + t.id + '">×</button></div></td></tr>').join('') : '<tr><td colspan="5">' + emptyState('☷', 'Ничего не найдено', 'Измените фильтры или добавьте новую задачу.', '＋ Добавить задачу', 'add-task') + '</td></tr>';
+        $('#tasks-table').innerHTML = rows.length ? rows.map(t => '<tr><td class="cell-title"><div class="row-title">' + escapeHtml(t.title) + '</div><div class="row-note">' + escapeHtml(t.area || 'Общее') + (t.owner ? ' · ' + escapeHtml(t.owner) : '') + '</div></td><td data-label="' + (lang === 'de' ? 'Status' : 'Статус') + '"><span class="status-pill status-' + t.status + '">' + ({todo:'К выполнению',progress:'В работе',done:'Готово',blocked:'Заблокировано'}[t.status]) + '</span></td><td data-label="' + (lang === 'de' ? 'Termin' : 'Срок') + '">' + formatDate(t.due, {day:'numeric',month:'short',year:'numeric'}) + '</td><td data-label="' + (lang === 'de' ? 'Priorität' : 'Приоритет') + '"><span class="priority ' + t.priority + '">' + ({high:'Высокий',medium:'Средний',low:'Низкий'}[t.priority]) + '</span></td><td class="cell-actions"><div class="action-cell"><button class="mini-btn" title="Открыть" data-task-open="' + t.id + '">✎</button><button class="mini-btn" title="Изменить статус" data-task-toggle="' + t.id + '">✓</button><button class="mini-btn" title="Удалить" data-delete-type="tasks" data-delete-id="' + t.id + '">×</button></div></td></tr>').join('') : '<tr class="is-empty"><td colspan="5">' + emptyState('☷', 'Ничего не найдено', 'Измените фильтры или добавьте новую задачу.', '＋ Добавить задачу', 'add-task') + '</td></tr>';
       }
       function renderContent() {
         const search = ($('#content-search')?.value || '').toLowerCase(); const channel = $('#content-channel-filter')?.value || 'all'; const status = $('#content-status-filter')?.value || 'all';
@@ -737,13 +1016,84 @@
       function inMonth(dateStr, cursor) { if (!dateStr) return false; const d = parseDate(dateStr); return d.getFullYear() === cursor.getFullYear() && d.getMonth() === cursor.getMonth(); }
       function eventsInRange(e, dIso) { const start = e.start; const end = e.end && e.end >= e.start ? e.end : e.start; return dIso >= start && dIso <= end; }
       function shiftMonth(which, delta) {
-        const cursor = which === 'event' ? eventCursor : contentCursor;
-        const next = delta === 0 ? new Date() : new Date(cursor.getFullYear(), cursor.getMonth() + delta, 1);
-        if (which === 'event') { eventCursor = next; renderEventCalendar(); renderEventList(); } else { contentCursor = next; renderCalendar(); }
+        if (which === 'event') { shiftCursor(delta); renderEventCalendar(); renderEventList(); }
+        else { contentCursor = delta === 0 ? new Date() : new Date(contentCursor.getFullYear(), contentCursor.getMonth() + delta, 1); renderCalendar(); }
         localizeDOM();
+      }
+      function startOfWeek(d) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+      function calRange() {
+        if (calMode === 'day') { const i = isoDate(eventCursor); return { from: i, to: i }; }
+        if (calMode === 'week') { const s = startOfWeek(eventCursor); return { from: isoDate(s), to: addDays(isoDate(s), 6) }; }
+        return { from: isoDate(new Date(eventCursor.getFullYear(), eventCursor.getMonth(), 1)),
+                 to: isoDate(new Date(eventCursor.getFullYear(), eventCursor.getMonth() + 1, 0)) };
+      }
+      function rangeLabel() {
+        const loc = lang === 'de' ? 'de-DE' : 'ru-RU';
+        if (calMode === 'day') return new Intl.DateTimeFormat(loc, { weekday:'long', day:'numeric', month:'long' }).format(eventCursor);
+        if (calMode === 'week') {
+          const { from, to } = calRange();
+          const f = new Intl.DateTimeFormat(loc, { day:'numeric', month:'short' });
+          return f.format(parseDate(from)) + ' – ' + f.format(parseDate(to));
+        }
+        return monthLabel(eventCursor);
+      }
+      function setCalMode(mode) {
+        if (!['day','week','month'].includes(mode)) return;
+        calMode = mode;
+        try { localStorage.setItem(CALMODE_KEY, mode); } catch (e) {}
+        $$('[data-cal-mode]').forEach(b => b.classList.toggle('active', b.dataset.calMode === mode));
+        renderEventCalendar(); renderEventList();
+      }
+      function shiftCursor(delta) {
+        if (delta === 0) { eventCursor = new Date(); return; }
+        const d = new Date(eventCursor);
+        if (calMode === 'day') d.setDate(d.getDate() + delta);
+        else if (calMode === 'week') d.setDate(d.getDate() + 7 * delta);
+        else { d.setDate(1); d.setMonth(d.getMonth() + delta); }
+        eventCursor = d;
+      }
+      function dayItemHtml(e) {
+        const cls = e.type === 'holiday' ? 'holiday' : e.type === 'meeting' ? 'meeting' : '';
+        const meta = e.occStart !== e.occEnd
+          ? formatDate(e.occStart, { day:'numeric', month:'short' }) + '–' + formatDate(e.occEnd, { day:'numeric', month:'short' })
+          : eventTypeLabel(e.type);
+        return '<button type="button" class="day-item" data-event-detail="' + e.id + '">'
+          + '<span class="dot ' + cls + '"></span>'
+          + '<span class="t">' + escapeHtml(e.title) + '</span>'
+          + '<span class="m">' + escapeHtml(meta) + '</span></button>';
+      }
+      function renderDayStrip() {
+        const strip = $('#event-day-strip'); if (!strip) return;
+        const de = lang === 'de';
+        const { from, to } = calRange();
+        const shown = eventInstances(from, to);
+        const days = [];
+        for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
+        const todayIso = isoDate(new Date());
+        strip.innerHTML = days.map(dIso => {
+          const items = shown.filter(e => dIso >= e.occStart && dIso <= e.occEnd);
+          const head = new Intl.DateTimeFormat(de ? 'de-DE' : 'ru-RU', { weekday:'long', day:'numeric', month:'long' }).format(parseDate(dIso));
+          return '<div class="day-group' + (dIso === todayIso ? ' is-today' : '') + '">'
+            + '<div class="day-group-head"><strong>' + escapeHtml(head) + '</strong>'
+            + '<span class="day-count">' + items.length + ' ' + (de ? 'Einträge' : 'записей') + '</span></div>'
+            + '<div class="day-group-body" data-empty="' + (de ? 'Keine Ereignisse' : 'Событий нет') + '">'
+            + items.map(dayItemHtml).join('') + '</div></div>';
+        }).join('');
       }
       function renderEventCalendar() {
         const grid = $('#event-calendar-grid'); if (!grid) return;
+        const wrap = $('#event-calendar-wrap'); const strip = $('#event-day-strip');
+        const labelEl0 = $('#event-month-label'); if (labelEl0) labelEl0.textContent = rangeLabel();
+        const capEl = $('#event-calendar-caption'); if (capEl) capEl.textContent = rangeLabel();
+        $$('[data-cal-mode]').forEach(b => b.classList.toggle('active', b.dataset.calMode === calMode));
+        if (calMode !== 'month') {
+          if (wrap) wrap.hidden = true;
+          if (strip) strip.hidden = false;
+          renderDayStrip();
+          return;
+        }
+        if (wrap) wrap.hidden = false;
+        if (strip) strip.hidden = true;
         const { monthStart, startDay, daysInMonth, prevDays } = monthMatrix(eventCursor);
         $('#event-calendar-caption').textContent = monthLabel(eventCursor);
         const labelEl = $('#event-month-label'); if (labelEl) labelEl.textContent = monthLabel(eventCursor);
@@ -770,12 +1120,11 @@
       }
       function renderEventList() {
         const list = $('#event-list'); if (!list) return;
-        const from = isoDate(new Date(eventCursor.getFullYear(), eventCursor.getMonth(), 1));
-        const to = isoDate(new Date(eventCursor.getFullYear(), eventCursor.getMonth() + 1, 0));
+        const { from, to } = calRange();
         const rows = eventInstances(from, to);
         const total = filteredEvents().length;
-        const summary = '<div class="month-summary"><span class="month-chip"><strong>' + rows.length + '</strong> ' + (lang === 'de' ? 'im Monat' : 'в этом месяце') + '</span><span class="month-chip"><strong>' + total + '</strong> ' + (lang === 'de' ? 'insgesamt im Kalender' : 'всего в календаре') + '</span></div>';
-        list.innerHTML = summary + (rows.length ? rows.map(eventRowHtml).join('') : emptyState('▦', lang === 'de' ? 'Keine Ereignisse in diesem Monat' : 'В этом месяце событий нет', lang === 'de' ? 'Monat wechseln, Filter zurücksetzen oder ICS/CSV importieren.' : 'Смените месяц, сбросьте фильтры или импортируйте ICS/CSV.', lang === 'de' ? '＋ Neues Ereignis' : '＋ Новое событие', 'add-event'));
+        const summary = '<div class="month-summary"><span class="month-chip"><strong>' + rows.length + '</strong> ' + (lang === 'de' ? { day:'am Tag', week:'in der Woche', month:'im Monat' }[calMode] : { day:'в этот день', week:'на этой неделе', month:'в этом месяце' }[calMode]) + '</span><span class="month-chip"><strong>' + total + '</strong> ' + (lang === 'de' ? 'insgesamt im Kalender' : 'всего в календаре') + '</span></div>';
+        list.innerHTML = summary + (rows.length ? rows.map(eventRowHtml).join('') : emptyState('▦', lang === 'de' ? 'Keine Ereignisse im gewählten Zeitraum' : 'В выбранном периоде событий нет', lang === 'de' ? 'Monat wechseln, Filter zurücksetzen oder ICS/CSV importieren.' : 'Смените месяц, сбросьте фильтры или импортируйте ICS/CSV.', lang === 'de' ? '＋ Neues Ereignis' : '＋ Новое событие', 'add-event'));
       }
       let activeFolder = 'all';
       let editingIdeaId = null;
@@ -1154,7 +1503,7 @@
         state.events = state.events.filter(x => x.id !== id);
         closeModal(); persist(); showToast(lang === 'de' ? 'Ereignis gelöscht' : 'Событие удалено');
       }
-      function exportData() { const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'social-desk-export-' + isoDate(today) + '.json'; link.click(); URL.revokeObjectURL(link.href); showToast(lang === 'de' ? 'Export vorbereitet' : 'Экспорт подготовлен'); }
+      function exportData() { const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'social-desk-export-' + isoDate(today) + '.json'; link.click(); URL.revokeObjectURL(link.href); try { localStorage.setItem(LASTEXPORT_KEY, String(Date.now())); } catch (e) {} renderStorageHealth(); showToast(lang === 'de' ? 'Export vorbereitet' : 'Экспорт подготовлен'); }
       function exportIcs() { const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Social Desk//Local Calendar//EN']; state.events.forEach(e => { lines.push('BEGIN:VEVENT','UID:' + escapeIcs(e.externalId || e.id),'DTSTAMP:' + icsDateTime(new Date()),'DTSTART;' + (e.allDay ? 'VALUE=DATE:' + e.start.replace(/-/g,'') : 'VALUE=DATE:' + e.start.replace(/-/g,'')),'DTEND;VALUE=DATE:' + addDays(e.end || e.start, 1).replace(/-/g,''),'SUMMARY:' + escapeIcs(e.title), 'DESCRIPTION:' + escapeIcs(e.description || ''), 'LOCATION:' + escapeIcs(e.location || ''));
         const rr = buildRRule(e.recurrence); if (rr) lines.push('RRULE:' + rr);
         lines.push('END:VEVENT'); }); lines.push('END:VCALENDAR'); downloadBlob(lines.join('\r\n'), 'social-desk-calendar-' + isoDate(today) + '.ics', 'text/calendar'); showToast(lang === 'de' ? 'ICS exportiert' : 'ICS экспортирован'); }
@@ -1394,7 +1743,7 @@
         logTask(task, (lang === 'de' ? 'Checkliste: ' : 'Чек-лист: ') + input.value.trim());
         persistQuiet(); openTaskCard(task.id);
       }
-      function persistQuiet() { state.updatedAt = new Date().toISOString(); try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { showToast(lang === 'de' ? 'Speicher voll — Anhang zu groß' : 'Хранилище переполнено — вложение слишком большое'); } renderTasks(); renderOverview(); renderPreview(); }
+      function persistQuiet() { state.updatedAt = new Date().toISOString(); if (!writeState(state)) showToast(lang === 'de' ? 'Speicher voll — Anhang zu groß' : 'Хранилище переполнено — вложение слишком большое'); renderTasks(); renderOverview(); renderPreview(); }
       function attachLink() {
         const task = currentTask(); if (!task) return;
         const url = prompt(lang === 'de' ? 'Link (z. B. OneDrive-Pfad oder URL)' : 'Ссылка (путь OneDrive или URL)');
@@ -1465,6 +1814,9 @@
         if (action === 'clear-calendar') clearCalendar();
         if (action === 'reset-workspace') resetWorkspace();
         if (action === 'export') exportData();
+        if (action === 'request-persist') requestPersistentStorage();
+        if (action === 'restore-snapshot') restoreFromSnapshot();
+        if (action === 'dismiss-backup') { try { localStorage.setItem(BACKUP_DISMISS_KEY, String(Date.now())); } catch (e) {} renderBackupBanner(); }
         if (action === 'import') importData();
         if (action === 'import-ics') importCalendar('ics');
         if (action === 'import-csv') importCalendar('csv');
@@ -1484,6 +1836,7 @@
         const eventTask = event.target.closest('[data-event-task]'); if (eventTask) { closeModal(); createTaskFromEvent(eventTask.dataset.eventTask); }
         const eventDelete = event.target.closest('[data-event-delete]'); if (eventDelete) { deleteEvent(eventDelete.dataset.eventDelete); return; }
         const eventDuplicate = event.target.closest('[data-event-duplicate]'); if (eventDuplicate) { closeModal(); duplicateEvent(eventDuplicate.dataset.eventDuplicate); }
+        const calModeBtn = event.target.closest('[data-cal-mode]'); if (calModeBtn) { setCalMode(calModeBtn.dataset.calMode); return; }
         const monthShift = event.target.closest('[data-month-shift]'); if (monthShift) { shiftMonth('event', Number(monthShift.dataset.monthShift)); return; }
         const contentShift = event.target.closest('[data-content-month-shift]'); if (contentShift) { shiftMonth('content', Number(contentShift.dataset.contentMonthShift)); return; }
         const chRen = event.target.closest('[data-channel-rename]'); if (chRen) { renameChannel(chRen.dataset.channelRename); return; }
@@ -1519,6 +1872,24 @@
       document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openModal('task'); } });
       applyLanguage();
       renderAll();
+      setCalMode(calMode);
+      checkPersistence();
+      renderStorageHealth();
+      // recover from IndexedDB if localStorage was wiped by the browser
+      idbGet(STORAGE_KEY).then(json => {
+        if (!json) { if (state) writeState(state); return; }
+        const localRaw = localStorage.getItem(STORAGE_KEY);
+        if (localRaw) return;
+        try {
+          const recovered = JSON.parse(json);
+          if (recovered && typeof recovered === 'object') {
+            localStorage.setItem(STORAGE_KEY, json);
+            state = loadState();
+            renderAll();
+            showToast(lang === 'de' ? 'Daten aus IndexedDB wiederhergestellt' : 'Данные восстановлены из IndexedDB');
+          }
+        } catch (e) { /* keep current state */ }
+      });
     })();
   </script>
 
