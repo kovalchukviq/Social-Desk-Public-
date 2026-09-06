@@ -283,8 +283,11 @@
     .notice { margin-top: 14px; padding: 11px 12px; border-left: 3px solid var(--teal); border-radius: 8px; background: var(--teal-soft); color: #00949D; font-size: 11px; }
     .data-preview { max-height: 360px; overflow: auto; padding: 14px; border-radius: 12px; background: #24475C; color: #D3E0E3; font: 11px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; word-break: break-word; }
 
-    .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: none; place-items: center; padding: 18px; background: rgba(24,47,62,.5); backdrop-filter: blur(4px); }
+    .link-open { border: 0; background: none; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: rgba(0,0,0,.25); text-underline-offset: 2px; }
+    .link-open:hover { text-decoration-color: currentColor; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 60; display: none; place-items: center; padding: 18px; background: rgba(24,47,62,.5); backdrop-filter: blur(4px); }
     .modal-backdrop.open { display: grid; }
+    body.modal-open { overflow: hidden; }
     .modal { width: min(560px, 100%); max-height: min(740px, 94vh); overflow: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--paper); box-shadow: 0 24px 80px rgba(0,0,0,.22); }
     .modal-header { display: flex; align-items: start; justify-content: space-between; gap: 18px; padding: 20px 22px 14px; }
     .modal-header h2 { margin: 0; font-family: var(--font-display); font-size: 28px; font-weight: 500; letter-spacing: -.04em; }
@@ -297,7 +300,7 @@
     .form-field input, .form-field select, .form-field textarea { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 10px; background: var(--paper-2); color: var(--ink); font-size: 12px; }
     .form-field textarea { min-height: 78px; resize: vertical; }
     .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding-top: 17px; }
-    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 20; display: none; max-width: 320px; padding: 12px 15px; border-radius: 10px; background: var(--ink); color: #fff; font-size: 12px; box-shadow: var(--shadow); }
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 80; display: none; max-width: 320px; padding: 12px 15px; border-radius: 10px; background: var(--ink); color: #fff; font-size: 12px; box-shadow: var(--shadow); }
     .toast.show { display: block; animation: toast-in .2s ease both; }
     @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
@@ -373,8 +376,9 @@
       .calendar-head { padding: 6px 2px; font-size: 9px; }
       .day-number { font-size: 11px; }
       .calendar-cell .cal-event {
-        display: block; overflow: hidden; height: 5px; margin-top: 2px; padding: 0;
-        border-radius: 3px; font-size: 0; text-indent: -999px;
+        display: block; overflow: hidden; margin-top: 2px; padding: 1px 3px;
+        border-radius: 3px; font-size: 8px; line-height: 1.25;
+        text-overflow: ellipsis; white-space: nowrap;
       }
       .calendar-cell .cal-more { font-size: 8px; }
 
@@ -390,7 +394,7 @@
         width: 100%; max-width: none; height: 100%; max-height: none;
         border: 0; border-radius: 0;
       }
-      .modal-head { padding: calc(16px + env(safe-area-inset-top)) 16px 12px; }
+      .modal-header { padding: calc(16px + env(safe-area-inset-top)) 16px 12px; }
       .modal-body { flex: 1 1 auto; overflow-y: auto; padding: 0 16px 16px; -webkit-overflow-scrolling: touch; }
       .modal-footer {
         position: sticky; bottom: 0; z-index: 2;
@@ -413,6 +417,36 @@
       .nav button { font-size: 8px; }
       .calendar-cell { min-height: 50px; }
     }
+
+    /* ---- time grid (day / week) ---- */
+    .time-grid-wrap { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); overflow: hidden; }
+    .allday-band { display: grid; border-bottom: 1px solid var(--line); background: var(--paper-2); }
+    .allday-band .ab-label { padding: 6px 8px; color: var(--muted); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+    .allday-band .ab-col { min-height: 26px; padding: 4px; border-left: 1px solid var(--line); }
+    .time-grid-scroll { max-height: 62vh; overflow-y: auto; }
+    .time-grid { display: grid; position: relative; }
+    .tg-hour-label { height: 44px; padding: 2px 6px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 10px; text-align: right; }
+    .tg-col { position: relative; border-left: 1px solid var(--line); }
+    .tg-slot { height: 44px; border-bottom: 1px solid var(--line); background: transparent; width: 100%; padding: 0; border-left: 0; border-right: 0; border-top: 0; cursor: pointer; }
+    .tg-slot:hover { background: var(--cadenabbia-100); }
+    .tg-colhead { padding: 7px 4px; border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 10px; font-weight: 750; text-align: center; }
+    .tg-colhead.is-today { color: var(--cadenabbia-600); }
+    .tg-event { position: absolute; left: 2px; right: 2px; overflow: hidden; padding: 3px 5px; border: 0; border-radius: 5px; background: var(--accent-soft); color: #6B5400; font-size: 10px; font-weight: 700; text-align: left; cursor: pointer; }
+    .tg-event.teal { background: var(--teal-soft); }
+    .tg-event.violet { background: var(--violet-soft); color: #FFFFFF; }
+    .tg-now { position: absolute; left: 0; right: 0; height: 2px; background: #C8102E; pointer-events: none; }
+    .day-open-btn { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; cursor: pointer; }
+    .calendar-cell .cal-event, .calendar-cell .cal-more { position: relative; z-index: 1; }
+    .cal-dot-count { position: absolute; right: 3px; top: 3px; z-index: 1; display: none; min-width: 14px; padding: 0 3px; border-radius: 999px; background: var(--cadenabbia); color: #fff; font-size: 8px; font-weight: 800; text-align: center; }
+
+    /* ---- linked records ---- */
+    .link-row { display: flex; align-items: center; gap: 9px; width: 100%; margin-bottom: 5px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper-2); color: var(--ink); font-size: 12px; text-align: left; cursor: pointer; }
+    .link-row:hover { border-color: var(--cadenabbia); background: var(--cadenabbia-100); }
+    .link-row .lr-kind { flex: 0 0 auto; font-size: 13px; }
+    .link-row .lr-title { flex: 1 1 auto; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .link-row .lr-meta { flex: 0 0 auto; color: var(--muted); font-size: 10px; }
+    .modal-back { display: none; margin-right: 8px; padding: 5px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper-2); color: var(--ink); font-size: 11px; cursor: pointer; }
+    .modal-back.on { display: inline-block; }
 
     /* ---- calendar view modes ---- */
     .cal-modes { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 4px; background: #EDF3F4; }
@@ -617,7 +651,7 @@
       <section class="view" id="view-calendar">
         <div class="view-header"><div><div class="eyebrow" data-i18n="calendar.eyebrow">Локальный календарь</div><h2 class="page-title" data-i18n="calendar.title">Календарь</h2><p data-i18n="calendar.intro">Импортируйте Outlook, праздники и задачи пакетно — без API и без отправки данных наружу.</p></div><button class="primary-btn" data-action="add-event" data-i18n="calendar.addEvent">＋ Новое событие</button></div>
         <div class="filter-bar"><input class="field" id="event-search" type="search" placeholder="Поиск по событиям…" aria-label="Поиск по событиям"><select class="select" id="event-type-filter" aria-label="Тип события"><option value="all">Все типы</option><option value="event">Событие</option><option value="meeting">Встреча</option><option value="task">Задача</option><option value="holiday">Праздник</option><option value="absence">Отсутствие</option><option value="reminder">Напоминание</option></select><select class="select" id="event-source-filter" aria-label="Источник"><option value="all">Все источники</option><option value="manual">Вручную</option><option value="outlook">Outlook / ICS</option><option value="todo">Microsoft To Do</option><option value="holiday-pack">Пакет праздников</option></select><select class="select" id="event-category-filter" aria-label="Категория"><option value="all">Все категории</option><option value="work">Работа</option><option value="social">Социальные медиа</option><option value="regional">Региональные даты</option><option value="personal">Личное</option></select><button class="ghost-btn" data-action="reset-event-filters" data-i18n="actions.reset">Сбросить</button></div>
-        <section class="panel"><div class="panel-header"><div><h2 class="panel-title" data-i18n="calendar.monthView">Календарь событий</h2><div class="panel-subtitle" id="event-calendar-caption"></div></div><div class="data-actions"><div class="cal-modes" role="group" data-i18n-aria="calendar.modeGroup" aria-label="Режим календаря"><button type="button" data-cal-mode="day" data-i18n="calendar.modeDay">День</button><button type="button" data-cal-mode="week" data-i18n="calendar.modeWeek">Неделя</button><button type="button" class="active" data-cal-mode="month" data-i18n="calendar.modeMonth">Месяц</button></div><div class="month-nav"><button data-month-shift="-1" data-i18n-aria="calendar.prev" aria-label="Назад">‹</button><span class="month-label" id="event-month-label"></span><button data-month-shift="1" data-i18n-aria="calendar.next" aria-label="Вперёд">›</button><button data-month-shift="0" data-i18n-aria="calendar.today" aria-label="Сегодня">•</button></div><button class="ghost-btn" data-action="import-ics" data-i18n="calendar.importIcs">↧ Импорт ICS</button><button class="ghost-btn" data-action="import-csv" data-i18n="calendar.importCsv">↧ Импорт CSV</button><button class="ghost-btn" data-action="export-ics" data-i18n="calendar.exportIcs">↥ Экспорт ICS</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить</button></div></div><div class="calendar-wrap" id="event-calendar-wrap"><div class="calendar-grid" id="event-calendar-grid"></div></div><div class="day-strip" id="event-day-strip" hidden></div><div class="calendar-import-preview" id="calendar-import-preview"></div></section>
+        <section class="panel"><div class="panel-header"><div><h2 class="panel-title" data-i18n="calendar.monthView">Календарь событий</h2><div class="panel-subtitle" id="event-calendar-caption"></div></div><div class="data-actions"><div class="cal-modes" role="group" data-i18n-aria="calendar.modeGroup" aria-label="Режим календаря"><button type="button" data-cal-mode="day" data-i18n="calendar.modeDay">День</button><button type="button" data-cal-mode="week" data-i18n="calendar.modeWeek">Неделя</button><button type="button" class="active" data-cal-mode="month" data-i18n="calendar.modeMonth">Месяц</button></div><div class="month-nav"><button data-month-shift="-1" data-i18n-aria="calendar.prev" aria-label="Назад">‹</button><span class="month-label" id="event-month-label"></span><button data-month-shift="1" data-i18n-aria="calendar.next" aria-label="Вперёд">›</button><button data-month-shift="0" data-i18n-aria="calendar.today" aria-label="Сегодня">•</button></div><button class="ghost-btn" data-action="import-ics" data-i18n="calendar.importIcs">↧ Импорт ICS</button><button class="ghost-btn" data-action="import-csv" data-i18n="calendar.importCsv">↧ Импорт CSV</button><button class="ghost-btn" data-action="export-ics" data-i18n="calendar.exportIcs">↥ Экспорт ICS</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить</button></div></div><div class="calendar-wrap" id="event-calendar-wrap"><div class="calendar-grid" id="event-calendar-grid"></div></div><div class="time-grid-wrap" id="event-time-grid" hidden></div><div class="day-strip" id="event-day-strip" hidden></div><div class="calendar-import-preview" id="calendar-import-preview"></div></section>
         <div style="height:16px"></div>
         <section class="panel"><div class="panel-header"><div><h2 class="panel-title" data-i18n="calendar.eventList">События выбранного месяца</h2><div class="panel-subtitle" data-i18n="calendar.eventListSub">Справочный список календаря. Задачи создаются только по вашему явному действию.</div></div></div><div class="panel-body"><div class="event-list" id="event-list"></div></div></section>
       </section>
@@ -630,7 +664,7 @@
   </div>
 
   <div class="modal-backdrop" id="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal"><div class="modal-header"><div><h2 id="modal-title">Новая запись</h2><p id="modal-subtitle">Выберите тип рабочей записи.</p></div><button class="icon-btn" data-action="close-modal" aria-label="Закрыть">×</button></div><div class="modal-body"><form id="entry-form"><div class="form-grid" id="form-fields"></div><div class="modal-footer"><button type="button" class="ghost-btn" data-action="close-modal">Отмена</button><button type="submit" class="primary-btn">Сохранить</button></div></form></div></div>
+    <div class="modal"><div class="modal-header"><div><button type="button" class="modal-back" id="modal-back" data-action="modal-back">‹ Назад</button><h2 id="modal-title">Новая запись</h2><p id="modal-subtitle">Выберите тип рабочей записи.</p></div><button class="icon-btn" data-action="close-modal" aria-label="Закрыть">×</button></div><div class="modal-body"><form id="entry-form"><div class="form-grid" id="form-fields"></div><div class="modal-footer"><button type="button" class="ghost-btn" data-action="close-modal">Отмена</button><button type="submit" class="primary-btn">Сохранить</button></div></form></div></div>
   </div>
   <input type="file" id="file-import" accept="application/json,.json" hidden>
   <input type="file" id="file-attachment" hidden><input type="file" id="file-calendar-import" accept=".ics,.csv,.txt,text/calendar,text/csv" hidden>
@@ -1301,6 +1335,9 @@
         ev.type = ev.type || 'event';
         ev.category = ev.category || 'work';
         ev.source = ev.source || 'manual';
+        ev.ideaId = ev.ideaId || '';
+        ev.startTime = /^\d{2}:\d{2}$/.test(ev.startTime || '') ? ev.startTime : '';
+        ev.endTime = /^\d{2}:\d{2}$/.test(ev.endTime || '') ? ev.endTime : '';
         ev.recurrence = { ...defaultRecurrence(), ...(ev.recurrence || {}) };
         if (!['none','daily','weekly','monthly','yearly'].includes(ev.recurrence.freq)) ev.recurrence.freq = 'none';
         ev.recurrence.interval = Math.max(1, parseInt(ev.recurrence.interval, 10) || 1);
@@ -1309,7 +1346,7 @@
         return ev;
       }
       function normalizeTask(t) {
-        return { ...t, status: t.status || 'todo', priority: t.priority || 'medium', log: Array.isArray(t.log) ? t.log : [], checklist: Array.isArray(t.checklist) ? t.checklist : [], attachments: Array.isArray(t.attachments) ? t.attachments : [], eventId: t.eventId || '' };
+        return { ...t, status: t.status || 'todo', priority: t.priority || 'medium', log: Array.isArray(t.log) ? t.log : [], checklist: Array.isArray(t.checklist) ? t.checklist : [], attachments: Array.isArray(t.attachments) ? t.attachments : [], eventId: t.eventId || '', ideaId: t.ideaId || '' };
       }
       function normalizeIdea(i, folderIds) {
         const o = { ...i };
@@ -1323,6 +1360,7 @@
         if (folderIds && o.folderId && folderIds.indexOf(o.folderId) === -1) o.folderId = '';
         o.eventId = o.eventId || '';
         o.taskId = o.taskId || '';
+        o.taskIds = Array.isArray(o.taskIds) ? o.taskIds.filter(Boolean) : (o.taskId ? [o.taskId] : []);
         o.createdAt = o.createdAt || new Date().toISOString();
         o.updatedAt = o.updatedAt || o.createdAt;
         o.log = Array.isArray(o.log) ? o.log : [];
@@ -1400,11 +1438,12 @@
       }
       function taskRowHtml(t) {
         const statusNames = { todo:'К выполнению', progress:'В работе', done:'Готово', blocked:'Заблокировано' };
-        return '<div class="task-row ' + (t.status === 'done' ? 'completed' : '') + '"><button class="check ' + (t.status === 'done' ? 'done' : '') + '" aria-label="Изменить статус задачи" data-task-toggle="' + t.id + '"></button><div><div class="task-title" data-task-open="' + t.id + '" style="cursor:pointer">' + escapeHtml(t.title) + '</div><div class="task-meta">' + escapeHtml(t.owner || 'Без ответственного') + ' · ' + escapeHtml(t.area || 'Общее') + '</div></div><div><span class="status-pill status-' + t.status + '">' + statusNames[t.status] + '</span></div></div>';
+        return '<div class="task-row ' + (t.status === 'done' ? 'completed' : '') + '"><button class="check ' + (t.status === 'done' ? 'done' : '') + '" aria-label="Изменить статус задачи" data-task-toggle="' + t.id + '"></button><div><div class="task-title" data-open-link="task:' + t.id + '" style="cursor:pointer">' + escapeHtml(t.title) + '</div><div class="task-meta">' + escapeHtml(t.owner || 'Без ответственного') + ' · ' + escapeHtml(t.area || 'Общее') + '</div></div><div><span class="status-pill status-' + t.status + '">' + statusNames[t.status] + '</span></div></div>';
       }
       function contentRowHtml(c) {
         const channelClass = c.channel === 'LinkedIn' ? '' : (c.channel === 'Instagram' ? 'teal' : 'violet');
-        return '<div class="content-row"><div class="date-block"><strong>' + (c.date ? parseDate(c.date).getDate() : '—') + '</strong><span>' + (c.date ? new Intl.DateTimeFormat('ru-RU',{month:'short'}).format(parseDate(c.date)).replace('.','') : '—') + '</span></div><div><div class="content-title">' + escapeHtml(c.title) + '</div><div class="content-meta">' + escapeHtml(c.status || 'Идея') + '</div></div><span class="channel-tag ' + channelClass + '">' + escapeHtml(c.channel || 'Канал') + '</span></div>';
+        const __lid = (state.ideas.find(i => i.title === c.title) || {}).id || '';
+        return '<div class="content-row"' + (__lid ? ' data-open-link="idea:' + __lid + '" style="cursor:pointer"' : '') + '><div class="date-block"><strong>' + (c.date ? parseDate(c.date).getDate() : '—') + '</strong><span>' + (c.date ? new Intl.DateTimeFormat('ru-RU',{month:'short'}).format(parseDate(c.date)).replace('.','') : '—') + '</span></div><div><div class="content-title">' + escapeHtml(c.title) + '</div><div class="content-meta">' + escapeHtml(c.status || 'Идея') + '</div></div><span class="channel-tag ' + channelClass + '">' + escapeHtml(c.channel || 'Канал') + '</span></div>';
       }
       function meetingRowHtml(m) {
         return '<div class="meeting-row"><div class="date-block"><strong>' + (m.date ? parseDate(m.date).getDate() : '—') + '</strong><span>' + (m.date ? new Intl.DateTimeFormat('ru-RU',{month:'short'}).format(parseDate(m.date)).replace('.','') : '—') + '</span></div><div><div class="meeting-title">' + escapeHtml(m.title) + '</div><div class="meeting-meta">' + escapeHtml(m.time || 'Время не указано') + ' · ' + escapeHtml(m.participants || 'Участники не указаны') + '</div></div><span class="status-pill status-progress">' + escapeHtml(m.status || 'Запланирована') + '</span></div>';
@@ -1412,7 +1451,7 @@
       function renderTasks() {
         const search = ($('#task-search')?.value || '').toLowerCase(); const status = $('#task-status-filter')?.value || 'all'; const priority = $('#task-priority-filter')?.value || 'all';
         const rows = state.tasks.filter(t => (!search || [t.title,t.owner,t.area,t.notes].join(' ').toLowerCase().includes(search)) && (status === 'all' || t.status === status) && (priority === 'all' || t.priority === priority)).sort((a,b) => sortByDate(a,b,'due'));
-        $('#tasks-table').innerHTML = rows.length ? rows.map(t => '<tr><td class="cell-title"><div class="row-title">' + escapeHtml(t.title) + '</div><div class="row-note">' + escapeHtml(t.area || 'Общее') + (t.owner ? ' · ' + escapeHtml(t.owner) : '') + '</div></td><td data-label="' + (lang === 'de' ? 'Status' : 'Статус') + '"><span class="status-pill status-' + t.status + '">' + ({todo:'К выполнению',progress:'В работе',done:'Готово',blocked:'Заблокировано'}[t.status]) + '</span></td><td data-label="' + (lang === 'de' ? 'Termin' : 'Срок') + '">' + formatDate(t.due, {day:'numeric',month:'short',year:'numeric'}) + '</td><td data-label="' + (lang === 'de' ? 'Priorität' : 'Приоритет') + '"><span class="priority ' + t.priority + '">' + ({high:'Высокий',medium:'Средний',low:'Низкий'}[t.priority]) + '</span></td><td class="cell-actions"><div class="action-cell"><button class="mini-btn" title="Открыть" data-task-open="' + t.id + '">✎</button><button class="mini-btn" title="Изменить статус" data-task-toggle="' + t.id + '">✓</button><button class="mini-btn" title="Удалить" data-delete-type="tasks" data-delete-id="' + t.id + '">×</button></div></td></tr>').join('') : '<tr class="is-empty"><td colspan="5">' + emptyState('☷', 'Ничего не найдено', 'Измените фильтры или добавьте новую задачу.', '＋ Добавить задачу', 'add-task') + '</td></tr>';
+        $('#tasks-table').innerHTML = rows.length ? rows.map(t => '<tr><td class="cell-title"><div class="row-title"><button type="button" class="link-open" data-task-open="' + t.id + '">' + escapeHtml(t.title) + '</button></div><div class="row-note">' + escapeHtml(t.area || 'Общее') + (t.owner ? ' · ' + escapeHtml(t.owner) : '') + '</div></td><td data-label="' + (lang === 'de' ? 'Status' : 'Статус') + '"><span class="status-pill status-' + t.status + '">' + ({todo:'К выполнению',progress:'В работе',done:'Готово',blocked:'Заблокировано'}[t.status]) + '</span></td><td data-label="' + (lang === 'de' ? 'Termin' : 'Срок') + '">' + formatDate(t.due, {day:'numeric',month:'short',year:'numeric'}) + '</td><td data-label="' + (lang === 'de' ? 'Priorität' : 'Приоритет') + '"><span class="priority ' + t.priority + '">' + ({high:'Высокий',medium:'Средний',low:'Низкий'}[t.priority]) + '</span></td><td class="cell-actions"><div class="action-cell"><button class="mini-btn" title="Открыть" data-task-open="' + t.id + '">✎</button><button class="mini-btn" title="Изменить статус" data-task-toggle="' + t.id + '">✓</button><button class="mini-btn" title="Удалить" data-delete-type="tasks" data-delete-id="' + t.id + '">×</button></div></td></tr>').join('') : '<tr class="is-empty"><td colspan="5">' + emptyState('☷', 'Ничего не найдено', 'Измените фильтры или добавьте новую задачу.', '＋ Добавить задачу', 'add-task') + '</td></tr>';
       }
       function renderContent() {
         const search = ($('#content-search')?.value || '').toLowerCase(); const channel = $('#content-channel-filter')?.value || 'all'; const status = $('#content-status-filter')?.value || 'all';
@@ -1451,7 +1490,7 @@
         const s = e.occStart || e.start, en = e.occEnd || e.end || s;
         const date = formatDate(s, {day:'numeric',month:'short',year:'numeric'}) + (en !== s ? ' – ' + formatDate(en, {day:'numeric',month:'short'}) : '');
         const rec = e.recurrence && e.recurrence.freq !== 'none' ? '<span class="event-source">\u21ba ' + escapeHtml(recurrenceLabel(e.recurrence)) + '</span>' : '';
-        return '<div class="event-row"><div class="event-time">' + escapeHtml(date) + '</div><div><div class="event-title">' + escapeHtml(e.title) + '</div><div class="event-meta"><span class="event-type">' + escapeHtml(eventTypeLabel(e.type)) + '</span><span class="event-source">' + escapeHtml(sourceLabel(e.source)) + '</span>' + rec + (e.location ? ' \u00b7 ' + escapeHtml(e.location) : '') + '</div></div><div class="event-actions"><button class="mini-btn" title="Details" data-event-detail="' + e.id + '">\u2315</button><button class="mini-btn" title="Task" data-event-task="' + e.id + '">\u2713</button><button class="mini-btn" title="Copy" data-event-duplicate="' + e.id + '">\uff0b</button><button class="mini-btn" title="Delete" data-delete-type="events" data-delete-id="' + e.id + '">\u00d7</button></div></div>';
+        return '<div class="event-row"><div class="event-time">' + escapeHtml(date) + '</div><div><div class="event-title" data-open-link="event:' + e.id + '" style="cursor:pointer">' + escapeHtml(e.title) + '</div><div class="event-meta"><span class="event-type">' + escapeHtml(eventTypeLabel(e.type)) + '</span><span class="event-source">' + escapeHtml(sourceLabel(e.source)) + '</span>' + rec + (e.location ? ' \u00b7 ' + escapeHtml(e.location) : '') + '</div></div><div class="event-actions"><button class="mini-btn" title="Details" data-event-detail="' + e.id + '">\u2315</button><button class="mini-btn" title="Task" data-event-task="' + e.id + '">\u2713</button><button class="mini-btn" title="Copy" data-event-duplicate="' + e.id + '">\uff0b</button><button class="mini-btn" title="Delete" data-delete-type="events" data-delete-id="' + e.id + '">\u00d7</button></div></div>';
       }
       function monthMatrix(cursor) {
         const monthStart = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
@@ -1529,19 +1568,96 @@
             + items.map(dayItemHtml).join('') + '</div></div>';
         }).join('');
       }
+      // ---- time grid (day / week) ------------------------------------------
+      const TG_H = 44, TG_FROM = 7, TG_TO = 21;
+      function evMinutes(t) { const m = /^(\d{2}):(\d{2})$/.exec(t || ''); return m ? (+m[1]) * 60 + (+m[2]) : -1; }
+      function tgLayout(items) {
+        const timed = items.filter(e => evMinutes(e.startTime) >= 0);
+        const sorted = timed.slice().sort((a, b) => evMinutes(a.startTime) - evMinutes(b.startTime));
+        const out = [];
+        sorted.forEach(e => {
+          const s0 = evMinutes(e.startTime);
+          const e0 = Math.max(s0 + 30, evMinutes(e.endTime) >= 0 ? evMinutes(e.endTime) : s0 + 60);
+          let col = 0;
+          while (out.some(o => o.col === col && s0 < o.e0 && e0 > o.s0)) col++;
+          out.push({ e, s0, e0, col });
+        });
+        const cols = out.reduce((m, o) => Math.max(m, o.col + 1), 1);
+        return { boxes: out, cols };
+      }
+      function tgEventHtml(box, cols) {
+        const e = box.e;
+        const cls = e.type === 'holiday' ? 'teal' : e.type === 'meeting' ? 'violet' : '';
+        const top = (box.s0 / 60 - TG_FROM) * TG_H;
+        const h = Math.max(20, (box.e0 - box.s0) / 60 * TG_H - 2);
+        const w = 100 / cols, left = box.col * w;
+        return '<button type="button" class="tg-event ' + cls + '" data-event-detail="' + e.id + '"'
+          + ' style="top:' + top + 'px;height:' + h + 'px;left:calc(' + left + '% + 2px);width:calc(' + w + '% - 4px)"'
+          + ' title="' + escapeHtml(e.title) + '">' + escapeHtml(e.startTime) + ' ' + escapeHtml(e.title) + '</button>';
+      }
+      function renderTimeGrid() {
+        const box = $('#event-time-grid'); if (!box) return;
+        const de = lang === 'de';
+        const { from, to } = calRange();
+        const shown = eventInstances(from, to);
+        const days = [];
+        for (let d = from; d <= to; d = addDays(d, 1)) days.push(d);
+        const todayIso = isoDate(new Date());
+        const colTpl = '68px repeat(' + days.length + ', minmax(0,1fr))';
+        const fmtHead = new Intl.DateTimeFormat(de ? 'de-DE' : 'ru-RU', { weekday: 'short', day: 'numeric', month: 'short' });
+        // all-day band
+        let band = '<div class="allday-band" style="grid-template-columns:' + colTpl + '">'
+          + '<div class="ab-label">' + (de ? 'Ganztägig' : 'Весь день') + '</div>';
+        days.forEach(dIso => {
+          const all = shown.filter(e => dIso >= e.occStart && dIso <= e.occEnd && evMinutes(e.startTime) < 0);
+          band += '<div class="ab-col">' + all.map(e => '<button type="button" class="cal-event ' + (e.type === 'holiday' ? 'teal' : e.type === 'meeting' ? 'violet' : '') + '" data-event-detail="' + e.id + '" title="' + escapeHtml(e.title) + '">' + escapeHtml(e.title) + '</button>').join('') + '</div>';
+        });
+        band += '</div>';
+        // column heads (week only)
+        let heads = '';
+        if (days.length > 1) {
+          heads = '<div class="allday-band" style="grid-template-columns:' + colTpl + '"><div class="ab-label"></div>'
+            + days.map(dIso => '<div class="tg-colhead' + (dIso === todayIso ? ' is-today' : '') + '">' + escapeHtml(fmtHead.format(parseDate(dIso))) + '</div>').join('')
+            + '</div>';
+        }
+        // hour grid
+        let hours = '';
+        for (let h = 0; h < 24; h++) hours += '<div class="tg-hour-label">' + String(h).padStart(2, '0') + ':00</div>';
+        let cols = '';
+        days.forEach(dIso => {
+          const items = shown.filter(e => dIso >= e.occStart && dIso <= e.occEnd);
+          const lay = tgLayout(items);
+          let slots = '';
+          for (let h = 0; h < 24; h++) slots += '<button type="button" class="tg-slot" data-slot-day="' + dIso + '" data-slot-hour="' + String(h).padStart(2, '0') + '" aria-label="' + (de ? 'Neues Ereignis' : 'Новое событие') + ' ' + dIso + ' ' + String(h).padStart(2, '0') + ':00"></button>';
+          let now = '';
+          if (dIso === todayIso) {
+            const n = new Date();
+            now = '<div class="tg-now" style="top:' + ((n.getHours() * 60 + n.getMinutes()) / 60 * TG_H) + 'px"></div>';
+          }
+          cols += '<div class="tg-col">' + slots + now + lay.boxes.map(b => tgEventHtml(b, lay.cols)).join('') + '</div>';
+        });
+        box.innerHTML = heads + band
+          + '<div class="time-grid-scroll" id="tg-scroll"><div class="time-grid" style="grid-template-columns:' + colTpl + '">'
+          + '<div>' + hours + '</div>' + cols + '</div></div>';
+        const sc = $('#tg-scroll');
+        if (sc) { try { sc.scrollTop = TG_FROM * TG_H; } catch (e) {} }
+      }
       function renderEventCalendar() {
         const grid = $('#event-calendar-grid'); if (!grid) return;
         const wrap = $('#event-calendar-wrap'); const strip = $('#event-day-strip');
         const labelEl0 = $('#event-month-label'); if (labelEl0) labelEl0.textContent = rangeLabel();
         const capEl = $('#event-calendar-caption'); if (capEl) capEl.textContent = rangeLabel();
         $$('[data-cal-mode]').forEach(b => b.classList.toggle('active', b.dataset.calMode === calMode));
+        const tg = $('#event-time-grid');
         if (calMode !== 'month') {
           if (wrap) wrap.hidden = true;
-          if (strip) strip.hidden = false;
-          renderDayStrip();
+          if (tg) tg.hidden = false;
+          if (strip) strip.hidden = true;
+          renderTimeGrid();
           return;
         }
         if (wrap) wrap.hidden = false;
+        if (tg) tg.hidden = true;
         if (strip) strip.hidden = true;
         const { monthStart, startDay, daysInMonth, prevDays } = monthMatrix(eventCursor);
         $('#event-calendar-caption').textContent = monthLabel(eventCursor);
@@ -1560,6 +1676,8 @@
           const visible = dayEvents.slice(0, 3);
           const more = dayEvents.length - visible.length;
           html += '<div class="calendar-cell ' + (current ? '' : 'muted') + (dayEvents.length ? ' has-events' : '') + '">'
+            + '<button type="button" class="day-open-btn" data-day-open="' + dIso + '" aria-label="' + (lang === 'de' ? 'Tag öffnen' : 'Открыть день') + ' ' + dIso + '"></button>'
+            + (dayEvents.length ? '<span class="cal-dot-count">' + dayEvents.length + '</span>' : '')
             + '<span class="day-number ' + (dIso === isoDate(new Date()) ? 'today' : '') + '">' + day + '</span>'
             + visible.map(e => '<span class="cal-event ' + (e.type === 'holiday' ? 'teal' : e.type === 'meeting' ? 'violet' : '') + '" data-event-detail="' + e.id + '" title="' + escapeHtml(e.title) + '">' + escapeHtml(e.title) + '</span>').join('')
             + (more > 0 ? '<span class="cal-more">+' + more + '</span>' : '')
@@ -1664,8 +1782,84 @@
       }
       function readLabels() {
         return lang === 'de'
-          ? { notes:'Notiz', check:'Checkliste', files:'Anhänge', log:'Verlauf', tags:'Schlagworte', empty:'Noch keine Einträge', edit:'Bearbeiten', close:'Schließen', noText:'Kein Text', folder:'Ordner', channel:'Kanal', owner:'Verantwortlich', area:'Bereich', due:'Fällig', priority:'Priorität', noDue:'ohne Termin' }
-          : { notes:'Заметка', check:'Чек-лист', files:'Вложения', log:'Журнал', tags:'Теги', empty:'Записей пока нет', edit:'Редактировать', close:'Закрыть', noText:'Текста нет', folder:'Папка', channel:'Канал', owner:'Ответственный', area:'Область', due:'Срок', priority:'Приоритет', noDue:'без срока' };
+          ? { notes:'Notiz', check:'Checkliste', files:'Anhänge', log:'Verlauf', tags:'Schlagworte', empty:'Noch keine Einträge', edit:'Bearbeiten', close:'Schließen', noText:'Kein Text', linkedTasks:'Verknüpfte Aufgaben', linkedEvent:'Verknüpftes Ereignis', sourceIdea:'Idee als Quelle', linkedIdeas:'Verknüpfte Ideen', newTask:'＋ Aufgabe erstellen', newEvent:'＋ Ereignis erstellen', folder:'Ordner', channel:'Kanal', owner:'Verantwortlich', area:'Bereich', due:'Fällig', priority:'Priorität', noDue:'ohne Termin' }
+          : { notes:'Заметка', check:'Чек-лист', files:'Вложения', log:'Журнал', tags:'Теги', empty:'Записей пока нет', edit:'Редактировать', close:'Закрыть', noText:'Текста нет', linkedTasks:'Связанные задачи', linkedEvent:'Связанное событие', sourceIdea:'Идея-источник', linkedIdeas:'Связанные идеи', newTask:'＋ Создать задачу', newEvent:'＋ Создать событие', folder:'Папка', channel:'Канал', owner:'Ответственный', area:'Область', due:'Срок', priority:'Приоритет', noDue:'без срока' };
+      }
+      // ---- modal stack + cross links ---------------------------------------
+      let modalStack = [];
+      const MODAL_STACK_MAX = 8;
+      function renderModalBack() {
+        const b = $('#modal-back'); if (!b) return;
+        b.textContent = (lang === 'de' ? '\u2039 Zur\u00fcck' : '\u2039 Назад');
+        if (modalStack.length) b.classList.add('on'); else b.classList.remove('on');
+      }
+      function openRecord(kind, id, mode) {
+        if (kind === 'task') { mode === 'edit' ? openTaskCard(id) : openTaskView(id); return; }
+        if (kind === 'idea') { mode === 'edit' ? openIdeaModal(id) : openIdeaView(id); return; }
+        if (kind === 'event') { showEventDetail(id); return; }
+      }
+      function currentFrame() {
+        if (currentModal === 'task-view') return { kind: 'task', id: editingTaskId, mode: 'read' };
+        if (currentModal === 'task-card') return { kind: 'task', id: editingTaskId, mode: 'edit' };
+        if (currentModal === 'idea-view') return { kind: 'idea', id: editingIdeaId, mode: 'read' };
+        if (currentModal === 'idea-edit') return { kind: 'idea', id: editingIdeaId, mode: 'edit' };
+        if (currentModal === 'event-edit') return { kind: 'event', id: editingEventId, mode: 'edit' };
+        return null;
+      }
+      function openLinked(kind, id) {
+        const frame = currentFrame();
+        if (frame && frame.id && !(frame.kind === kind && frame.id === id)) {
+          modalStack.push(frame);
+          if (modalStack.length > MODAL_STACK_MAX) modalStack.shift();
+        }
+        const keep = modalStack.slice();
+        openRecord(kind, id, 'read');
+        modalStack = keep;
+        renderModalBack();
+      }
+      function modalBack() {
+        const frame = modalStack.pop();
+        if (!frame) { closeModal(); return; }
+        const keep = modalStack.slice();
+        openRecord(frame.kind, frame.id, frame.mode);
+        modalStack = keep;
+        renderModalBack();
+      }
+      function linkRowHtml(kind, id, icon, title, meta) {
+        return '<button type="button" class="link-row" data-open-link="' + kind + ':' + id + '">'
+          + '<span class="lr-kind" aria-hidden="true">' + icon + '</span>'
+          + '<span class="lr-title">' + escapeHtml(title) + '</span>'
+          + '<span class="lr-meta">' + escapeHtml(meta || '') + '</span></button>';
+      }
+      function taskLinkHtml(t) {
+        const due = t.due ? formatDate(t.due, { day: 'numeric', month: 'short' }) : (lang === 'de' ? 'ohne Termin' : 'без срока');
+        return linkRowHtml('task', t.id, '\u2637', t.title, taskStatusLabel(t.status) + ' \u00b7 ' + due);
+      }
+      function ideaLinkHtml(i) {
+        return linkRowHtml('idea', i.id, '\u25eb', i.title, ideaStatusLabel(i.status) + ' \u00b7 ' + folderName(i.folderId));
+      }
+      function eventLinkHtml(e) {
+        const when = formatDate(e.start, { day: 'numeric', month: 'long', year: 'numeric' }) + (e.startTime ? ' \u00b7 ' + e.startTime : '');
+        return linkRowHtml('event', e.id, '\u25a6', e.title, when);
+      }
+      function tasksOfIdea(id) { return state.tasks.filter(t => t.ideaId === id); }
+      function tasksOfEvent(id) { return state.tasks.filter(t => t.eventId === id); }
+      function ideasOfEvent(id) { return state.ideas.filter(i => i.eventId === id); }
+      function linkedBlockIdea(idea, L) {
+        let h = '';
+        const tks = tasksOfIdea(idea.id);
+        if (tks.length) h += readBlock(L.linkedTasks, tks.map(taskLinkHtml).join(''));
+        const ev = idea.eventId ? state.events.find(e => e.id === idea.eventId) : null;
+        if (ev) h += readBlock(L.linkedEvent, eventLinkHtml(ev));
+        return h;
+      }
+      function linkedBlockTask(task, L) {
+        let h = '';
+        const idea = task.ideaId ? state.ideas.find(i => i.id === task.ideaId) : null;
+        if (idea) h += readBlock(L.sourceIdea, ideaLinkHtml(idea));
+        const ev = task.eventId ? state.events.find(e => e.id === task.eventId) : null;
+        if (ev) h += readBlock(L.linkedEvent, eventLinkHtml(ev));
+        return h;
       }
       function readBlock(title, inner) { return '<div class="read-section"><h4>' + title + '</h4>' + inner + '</div>'; }
       function readText(value, L) {
@@ -1703,10 +1897,12 @@
           + readBlock(L.notes, readText(idea.notes, L))
           + readBlock(L.check, readChecklist(idea.checklist, L))
           + readBlock(L.files, readAttachments(idea.attachments, L))
+          + linkedBlockIdea(idea, L)
+          + '<div class="modal-actions"><button type="button" class="ghost-btn" data-idea-task="' + idea.id + '">' + L.newTask + '</button><button type="button" class="ghost-btn" data-idea-event="' + idea.id + '">' + L.newEvent + '</button></div>'
           + readBlock(L.log, readLog(idea.log, L))
           + '</div>';
         setReadFooter('edit-idea', id, L);
-        wrapTextareas(); $('#modal-backdrop').classList.add('open');
+        wrapTextareas(); $('#modal-backdrop').classList.add('open'); afterModalOpen();
         hydrateSoon();
       }
       function openTaskView(id) {
@@ -1723,10 +1919,11 @@
           + readBlock(L.notes, readText(task.notes, L))
           + readBlock(L.check, readChecklist(task.checklist, L))
           + readBlock(L.files, readAttachments(task.attachments, L))
+          + linkedBlockTask(task, L)
           + readBlock(L.log, readLog(task.log, L))
           + '</div>';
         setReadFooter('edit-task', id, L);
-        wrapTextareas(); $('#modal-backdrop').classList.add('open');
+        wrapTextareas(); $('#modal-backdrop').classList.add('open'); afterModalOpen();
         hydrateSoon();
       }
       function ideaFormHtml(idea) {
@@ -1762,7 +1959,7 @@
         $('#modal-subtitle').textContent = lang === 'de' ? 'Kalenderverknüpfung nur manuell.' : 'Связь с календарём — только вручную.';
         $('#form-fields').innerHTML = ideaFormHtml(idea);
         $('#entry-form').querySelector('.modal-footer').innerHTML = '<button type="button" class="ghost-btn" data-action="close-modal">' + (lang === 'de' ? 'Abbrechen' : 'Отмена') + '</button><button type="submit" class="primary-btn">' + (lang === 'de' ? 'Speichern' : 'Сохранить') + '</button>';
-        wrapTextareas(); $('#modal-backdrop').classList.add('open');
+        wrapTextareas(); $('#modal-backdrop').classList.add('open'); afterModalOpen();
       }
       function readIdeaFromForm(form) {
         const d = Object.fromEntries(new FormData(form).entries());
@@ -1795,22 +1992,28 @@
       function deleteIdea(id) {
         if (!confirm(lang === 'de' ? 'Idee löschen?' : 'Удалить идею?')) return;
         state.ideas = state.ideas.filter(i => i.id !== id);
+        pruneLinks();
         editingIdeaId = null; closeModal(); persist(); showToast(lang === 'de' ? 'Idee gelöscht' : 'Идея удалена');
       }
       function createEventFromIdea(id) {
         const idea = state.ideas.find(i => i.id === id); if (!idea) return;
-        const ev = normalizeEvent({ id: uid('event'), title: idea.title, start: isoDate(today), end: isoDate(today), type: 'event', category: 'social', location: '', description: idea.notes || '', allDay: false, source: 'manual', externalId: '', importedAt: new Date().toISOString() });
+        const ev = normalizeEvent({ id: uid('event'), title: idea.title, start: isoDate(today), end: isoDate(today), type: 'event', category: 'social', location: '', description: idea.notes || '', allDay: false, source: 'manual', externalId: '', importedAt: new Date().toISOString(), ideaId: idea.id });
         state.events.push(ev); idea.eventId = ev.id;
         logIdea(idea, lang === 'de' ? 'Ereignis aus Idee erstellt' : 'Событие создано из идеи');
-        closeModal(); persist(); navTo('calendar'); showToast(lang === 'de' ? 'Ereignis aus Idee erstellt' : 'Событие создано из идеи');
+        persist(); showToast(lang === 'de' ? 'Ereignis aus Idee erstellt' : 'Событие создано из идеи');
+        openLinked('event', ev.id);
       }
       function createTaskFromIdea(id) {
         const idea = state.ideas.find(i => i.id === id); if (!idea) return;
-        const nt = normalizeTask({ id: uid('task'), title: idea.title, owner: '', area: idea.channel || 'Ideen', due: '', priority: 'medium', status: 'todo', notes: idea.notes || '' });
+        const nt = normalizeTask({ id: uid('task'), title: idea.title, owner: '', area: idea.channel || 'Ideen', due: '', priority: 'medium', status: 'todo', notes: idea.notes || '', ideaId: idea.id, eventId: idea.eventId || '' });
         logTask(nt, lang === 'de' ? 'Aus Idee erstellt' : 'Создано из идеи');
-        state.tasks.push(nt); idea.taskId = nt.id;
+        state.tasks.push(nt);
+        idea.taskId = nt.id;
+        idea.taskIds = Array.isArray(idea.taskIds) ? idea.taskIds : [];
+        if (idea.taskIds.indexOf(nt.id) === -1) idea.taskIds.push(nt.id);
         logIdea(idea, lang === 'de' ? 'Aufgabe aus Idee erstellt' : 'Задача создана из идеи');
-        closeModal(); persist(); navTo('tasks'); showToast(lang === 'de' ? 'Aufgabe aus Idee erstellt' : 'Задача создана из идеи');
+        persist(); showToast(lang === 'de' ? 'Aufgabe aus Idee erstellt' : 'Задача создана из идеи');
+        openLinked('task', nt.id);
       }
       // --- channels ---
       function addChannelInline() {
@@ -2003,41 +2206,74 @@
           task: '<div class="form-field full"><label for="entry-title">Название</label><input id="entry-title" name="title" required placeholder="Например: согласовать тезисы публикации"></div><div class="form-field"><label for="entry-owner">Ответственный</label><input id="entry-owner" name="owner" placeholder="Имя или роль"></div><div class="form-field"><label for="entry-area">Область</label><input id="entry-area" name="area" placeholder="Например: LinkedIn"></div><div class="form-field"><label for="entry-due">Срок</label><input id="entry-due" name="due" type="date"></div><div class="form-field"><label for="entry-priority">Приоритет</label><select id="entry-priority" name="priority"><option value="medium">Средний</option><option value="high">Высокий</option><option value="low">Низкий</option></select></div><div class="form-field"><label for="entry-status">Статус</label><select id="entry-status" name="status"><option value="todo">К выполнению</option><option value="progress">В работе</option><option value="blocked">Заблокировано</option></select></div><div class="form-field full"><label for="entry-notes">Примечание</label><textarea id="entry-notes" name="notes" placeholder="Контекст, ссылка на исходные материалы или критерий готовности"></textarea></div>',
           content: '<div class="form-field full"><label for="entry-title">Название</label><input id="entry-title" name="title" required placeholder="Например: пост о производственной инновации"></div><div class="form-field"><label for="entry-date">Дата</label><input id="entry-date" name="date" type="date" required></div><div class="form-field"><label for="entry-channel">Канал</label><select id="entry-channel" name="channel"><option>LinkedIn</option><option>Instagram</option><option>Internal</option><option>Website</option></select></div><div class="form-field"><label for="entry-status">Статус</label><select id="entry-status" name="status"><option>Идея</option><option>В работе</option><option>На согласовании</option><option>Запланировано</option><option>Опубликовано</option></select></div><div class="form-field"><label for="entry-owner">Ответственный</label><input id="entry-owner" name="owner" placeholder="Имя или роль"></div><div class="form-field full"><label for="entry-notes">Краткое описание</label><textarea id="entry-notes" name="notes" placeholder="Цель, основной тезис или следующий шаг"></textarea></div>',
           meeting: '<div class="form-field full"><label for="entry-title">Название</label><input id="entry-title" name="title" required placeholder="Например: еженедельный контент-синк"></div><div class="form-field"><label for="entry-date">Дата</label><input id="entry-date" name="date" type="date" required></div><div class="form-field"><label for="entry-time">Время</label><input id="entry-time" name="time" type="time"></div><div class="form-field full"><label for="entry-participants">Участники</label><input id="entry-participants" name="participants" placeholder="Имена или роли через запятую"></div><div class="form-field full"><label for="entry-agenda">Повестка</label><textarea id="entry-agenda" name="agenda" placeholder="Что нужно обсудить"></textarea></div><div class="form-field full"><label for="entry-outcome">Ожидаемый результат</label><textarea id="entry-outcome" name="outcome" placeholder="Какое решение или следующий шаг должен появиться"></textarea></div>',
-          event: '<div class="form-field full"><label for="entry-title">Название</label><input id="entry-title" name="title" required placeholder="Например: редакционный синк"></div><div class="form-field"><label for="entry-start">Дата начала</label><input id="entry-start" name="start" type="date" required></div><div class="form-field"><label for="entry-end">Дата окончания</label><input id="entry-end" name="end" type="date"></div><div class="form-field"><label for="entry-event-type">Тип</label><select id="entry-event-type" name="eventType"><option value="event">Событие</option><option value="meeting">Встреча</option><option value="task">Задача</option><option value="holiday">Праздник</option><option value="absence">Отсутствие</option><option value="reminder">Напоминание</option></select></div><div class="form-field"><label for="entry-category">Категория</label><select id="entry-category" name="category"><option value="work">Работа</option><option value="social">Социальные медиа</option><option value="regional">Региональные даты</option><option value="personal">Личное</option></select></div><div class="form-field"><label for="entry-location">Место</label><input id="entry-location" name="location" placeholder="Место или ссылка"></div><div class="form-field"><label for="entry-all-day"><input id="entry-all-day" name="allDay" type="checkbox" value="true"> Весь день</label></div><div class="form-field full"><label for="entry-description">Описание</label><textarea id="entry-description" name="description" placeholder="Контекст, повестка или заметка"></textarea></div>' + recurrenceFieldHtml()
+          event: '<div class="form-field full"><label for="entry-title">Название</label><input id="entry-title" name="title" required placeholder="Например: редакционный синк"></div><div class="form-field"><label for="entry-start">Дата начала</label><input id="entry-start" name="start" type="date" required></div><div class="form-field"><label for="entry-end">Дата окончания</label><input id="entry-end" name="end" type="date"></div><div class="form-field"><label for="entry-start-time">Время начала</label><input id="entry-start-time" name="startTime" type="time"></div><div class="form-field"><label for="entry-end-time">Время окончания</label><input id="entry-end-time" name="endTime" type="time"></div><div class="form-field"><label for="entry-event-type">Тип</label><select id="entry-event-type" name="eventType"><option value="event">Событие</option><option value="meeting">Встреча</option><option value="task">Задача</option><option value="holiday">Праздник</option><option value="absence">Отсутствие</option><option value="reminder">Напоминание</option></select></div><div class="form-field"><label for="entry-category">Категория</label><select id="entry-category" name="category"><option value="work">Работа</option><option value="social">Социальные медиа</option><option value="regional">Региональные даты</option><option value="personal">Личное</option></select></div><div class="form-field"><label for="entry-location">Место</label><input id="entry-location" name="location" placeholder="Место или ссылка"></div><div class="form-field"><label for="entry-all-day"><input id="entry-all-day" name="allDay" type="checkbox" value="true"> Весь день</label></div><div class="form-field full"><label for="entry-description">Описание</label><textarea id="entry-description" name="description" placeholder="Контекст, повестка или заметка"></textarea></div>' + recurrenceFieldHtml()
         };
-        $('#entry-form').querySelector('.modal-footer').innerHTML = '<button type="button" class="ghost-btn" data-action="close-modal">' + (lang === 'de' ? 'Abbrechen' : 'Отмена') + '</button><button type="submit" class="primary-btn">' + (lang === 'de' ? 'Speichern' : 'Сохранить') + '</button>'; editingTaskId = null; editingEventId = null; $('#form-fields').innerHTML = fields[type]; $('#entry-form').reset(); if ($('#entry-date')) $('#entry-date').value = isoDate(today); if ($('#entry-start')) $('#entry-start').value = isoDate(today); if ($('#entry-end')) $('#entry-end').value = isoDate(today); localizeDOM(); updateRecurrencePreview(); wrapTextareas(); $('#modal-backdrop').classList.add('open'); setTimeout(() => $('#entry-title')?.focus(), 0);
+        $('#entry-form').querySelector('.modal-footer').innerHTML = '<button type="button" class="ghost-btn" data-action="close-modal">' + (lang === 'de' ? 'Abbrechen' : 'Отмена') + '</button><button type="submit" class="primary-btn">' + (lang === 'de' ? 'Speichern' : 'Сохранить') + '</button>'; editingTaskId = null; editingEventId = null; $('#form-fields').innerHTML = fields[type]; $('#entry-form').reset(); if ($('#entry-date')) $('#entry-date').value = isoDate(today); if ($('#entry-start')) $('#entry-start').value = isoDate(today); if ($('#entry-end')) $('#entry-end').value = isoDate(today); localizeDOM(); updateRecurrencePreview(); wrapTextareas(); $('#modal-backdrop').classList.add('open'); afterModalOpen(); setTimeout(() => $('#entry-title')?.focus(), 0);
+      }
+      function pruneLinks() {
+        const taskIds = state.tasks.map(t => t.id);
+        const eventIds = state.events.map(e => e.id);
+        const ideaIds = state.ideas.map(i => i.id);
+        state.tasks.forEach(t => {
+          if (t.eventId && eventIds.indexOf(t.eventId) === -1) t.eventId = '';
+          if (t.ideaId && ideaIds.indexOf(t.ideaId) === -1) t.ideaId = '';
+        });
+        state.ideas.forEach(i => {
+          if (i.eventId && eventIds.indexOf(i.eventId) === -1) i.eventId = '';
+          if (i.taskId && taskIds.indexOf(i.taskId) === -1) i.taskId = '';
+          i.taskIds = (Array.isArray(i.taskIds) ? i.taskIds : []).filter(x => taskIds.indexOf(x) !== -1);
+        });
+        state.events.forEach(e => { if (e.ideaId && ideaIds.indexOf(e.ideaId) === -1) e.ideaId = ''; });
+      }
+      function afterModalOpen() {
+        try { document.body.classList.add('modal-open'); } catch (e) {}
+        renderModalBack();
       }
       function closeModal() {
         const m0 = $('#modal-backdrop') && $('#modal-backdrop').querySelector('.modal');
-        if (m0 && m0.classList) m0.classList.remove('text-full'); $('#modal-backdrop').classList.remove('open'); currentModal = null; }
+        if (m0 && m0.classList) m0.classList.remove('text-full'); $('#modal-backdrop').classList.remove('open'); currentModal = null;
+        modalStack = []; renderModalBack();
+        try { document.body.classList.remove('modal-open'); } catch (e) {} }
       function handleSubmit(event) { event.preventDefault(); if (currentModal === 'task-card') { saveTaskCard(event.target); return; } if (currentModal === 'idea' || currentModal === 'idea-edit') { saveIdea(event.target); return; } const data = Object.fromEntries(new FormData(event.target).entries()); let __newTaskId = null; if (currentModal === 'task') { const nt = normalizeTask({ id:uid('task'), ...data, status:data.status || 'todo', priority:data.priority || 'medium' }); logTask(nt, lang === 'de' ? 'Aufgabe angelegt' : 'Задача создана'); state.tasks.push(nt); __newTaskId = nt.id; } if (currentModal === 'content') state.content.push({ id:uid('content'), ...data }); if (currentModal === 'meeting') state.meetings.push({ id:uid('meeting'), ...data, status:'Запланирована' }); if (currentModal === 'event-edit') {
           const idx = state.events.findIndex(x => x.id === editingEventId);
           if (idx !== -1) {
             const prev = state.events[idx];
-            state.events[idx] = normalizeEvent({ ...prev, recurrence: readRecurrenceFromForm(event.target), title:data.title, start:data.start, end:data.end || data.start, type:data.eventType || 'event', category:data.category || 'work', location:data.location || '', description:data.description || '', allDay:data.allDay === 'true' });
+            state.events[idx] = normalizeEvent({ ...prev, recurrence: readRecurrenceFromForm(event.target), title:data.title, start:data.start, end:data.end || data.start, startTime:data.startTime || '', endTime:data.endTime || '', type:data.eventType || 'event', category:data.category || 'work', location:data.location || '', description:data.description || '', allDay:data.allDay === 'true' });
           }
           if (data.start) eventCursor = parseDate(data.start);
           editingEventId = null; closeModal(); persist(); showToast(lang === 'de' ? 'Ereignis aktualisiert' : 'Событие обновлено'); return;
-        } if (currentModal === 'event') state.events.push(normalizeEvent({ recurrence: readRecurrenceFromForm(event.target), id:uid('event'), title:data.title, start:data.start, end:data.end || data.start, type:data.eventType || 'event', category:data.category || 'work', location:data.location || '', description:data.description || '', allDay:data.allDay === 'true', source:'manual', externalId:'', importedAt:new Date().toISOString() })); if (data.start) eventCursor = parseDate(data.start); closeModal(); persist(); showToast(lang === 'de' ? 'Lokal gespeichert' : 'Запись сохранена локально'); if (__newTaskId) openTaskView(__newTaskId); }
+        } if (currentModal === 'event') state.events.push(normalizeEvent({ recurrence: readRecurrenceFromForm(event.target), id:uid('event'), title:data.title, start:data.start, end:data.end || data.start, startTime:data.startTime || '', endTime:data.endTime || '', type:data.eventType || 'event', category:data.category || 'work', location:data.location || '', description:data.description || '', allDay:data.allDay === 'true', source:'manual', externalId:'', importedAt:new Date().toISOString() })); if (data.start) eventCursor = parseDate(data.start); closeModal(); persist(); showToast(lang === 'de' ? 'Lokal gespeichert' : 'Запись сохранена локально'); if (__newTaskId) openTaskView(__newTaskId); }
       function toggleTask(id) { const task = state.tasks.find(t => t.id === id); if (!task) return; normalizeTaskInPlace(task); const prev = task.status; task.status = task.status === 'done' ? 'todo' : 'done'; logTask(task, (lang === 'de' ? 'Status: ' : 'Статус: ') + taskStatusLabel(prev) + ' → ' + taskStatusLabel(task.status)); persist(); showToast(task.status === 'done' ? 'Задача отмечена как готовая' : 'Задача возвращена в работу'); }
-      function deleteItem(type, id) { if (!confirm(lang === 'de' ? 'Diesen Eintrag löschen?' : 'Удалить эту запись?')) return; state[type] = state[type].filter(item => item.id !== id); persist(); showToast(lang === 'de' ? 'Gelöscht' : 'Запись удалена'); }
+      function deleteItem(type, id) { if (!confirm(lang === 'de' ? 'Diesen Eintrag löschen?' : 'Удалить эту запись?')) return; state[type] = state[type].filter(item => item.id !== id); pruneLinks(); persist(); showToast(lang === 'de' ? 'Gelöscht' : 'Запись удалена'); }
       function createTaskFromEvent(id) { const e = state.events.find(x => x.id === id); if (!e) return; const nt = normalizeTask({ id:uid('task'), title:e.title, owner:'', area:e.category || 'Календарь', due:e.start, priority:'medium', status:'todo', notes:e.description || '', eventId:e.id }); logTask(nt, lang === 'de' ? 'Aus Kalenderereignis erstellt' : 'Создано из события календаря'); state.tasks.push(nt); persist(); navTo('tasks'); showToast(lang === 'de' ? 'Aufgabe erstellt' : 'Задача создана из события'); }
       function duplicateEvent(id) { const e = state.events.find(x => x.id === id); if (!e) return; state.events.push({ ...e, id:uid('event'), title:e.title + (lang === 'de' ? ' (Kopie)' : ' (копия)'), externalId:'' }); persist(); showToast(lang === 'de' ? 'Ereignis dupliziert' : 'Событие дублировано'); }
       function showEventDetail(id) {
         const e = state.events.find(x => x.id === id); if (!e) return;
+        const __keep = modalStack.slice();
         openModal('event');
+        modalStack = __keep;
         editingEventId = e.id; currentModal = 'event-edit';
         $('#modal-title').textContent = (lang === 'de' ? 'Ereignis bearbeiten' : 'Редактирование события');
         $('#modal-subtitle').textContent = eventTypeLabel(e.type) + ' · ' + sourceLabel(e.source);
         const set = (sel, val) => { const el = $(sel); if (el) el.value = val || ''; };
         set('#entry-title', e.title); set('#entry-start', e.start); set('#entry-end', e.end || e.start);
+        set('#entry-start-time', e.startTime); set('#entry-end-time', e.endTime);
         set('#entry-event-type', e.type); set('#entry-category', e.category);
         set('#entry-location', e.location); set('#entry-description', e.description);
         if ($('#entry-all-day')) $('#entry-all-day').checked = !!e.allDay;
         const rec = { ...defaultRecurrence(), ...(e.recurrence || {}) };
         set('#rec-freq', rec.freq || 'none'); set('#rec-interval', rec.interval || 1); set('#rec-until', rec.until || '');
         $$('input[name="recDay"]').forEach(i => { i.checked = (rec.byday || []).indexOf(i.value) !== -1; });
+        renderModalBack();
         updateRecurrencePreview();
+        (function () {
+          const L = readLabels();
+          const tks = tasksOfEvent(e.id), ids = ideasOfEvent(e.id);
+          let extra = '';
+          if (tks.length) extra += readBlock(L.linkedTasks, tks.map(taskLinkHtml).join(''));
+          if (ids.length) extra += readBlock(L.linkedIdeas, ids.map(ideaLinkHtml).join(''));
+          if (extra) $('#form-fields').innerHTML += '<div class="form-field full read-view">' + extra + '</div>';
+        })();
         $('#entry-form').querySelector('.modal-footer').innerHTML =
           '<button type="button" class="ghost-btn" data-event-delete="' + e.id + '">' + (lang === 'de' ? '✗ Löschen' : '✗ Удалить') + '</button>' +
           '<button type="button" class="ghost-btn" data-event-task="' + e.id + '">' + (lang === 'de' ? '＋ Aufgabe' : '＋ Задача') + '</button>' +
@@ -2050,6 +2286,7 @@
         const e = state.events.find(x => x.id === id); if (!e) return;
         if (!confirm((lang === 'de' ? 'Ereignis löschen: ' : 'Удалить событие: ') + e.title + '?')) return;
         state.events = state.events.filter(x => x.id !== id);
+        pruneLinks();
         closeModal(); persist(); showToast(lang === 'de' ? 'Ereignis gelöscht' : 'Событие удалено');
       }
       function exportData() { const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'social-desk-export-' + isoDate(today) + '.json'; link.click(); URL.revokeObjectURL(link.href); try { localStorage.setItem(LASTEXPORT_KEY, String(Date.now())); } catch (e) {} renderStorageHealth(); showToast(lang === 'de' ? 'Export vorbereitet' : 'Экспорт подготовлен'); }
@@ -2275,7 +2512,7 @@
           + (task.log.length ? task.log.map(l => '<div class="card-line"><span><em>' + new Date(l.at).toLocaleString(lang === 'de' ? 'de-DE' : 'ru-RU') + '</em> — ' + escapeHtml(l.text) + '</span></div>').join('') : '<div class="card-empty">' + t.empty + '</div>')
           + '</div></div>';
         $('#entry-form').querySelector('.modal-footer').innerHTML = '<button type="button" class="ghost-btn" data-action="close-modal">' + t.close + '</button><button type="submit" class="primary-btn">' + t.save + '</button>';
-        wrapTextareas(); $('#modal-backdrop').classList.add('open');
+        wrapTextareas(); $('#modal-backdrop').classList.add('open'); afterModalOpen();
       }
       function normalizeTaskInPlace(t) {
         t.log = Array.isArray(t.log) ? t.log : [];
@@ -2339,6 +2576,12 @@
 
       $('#today-chip').textContent = formatLongDate(isoDate(today));
       document.addEventListener('click', (event) => {
+        const lnk = event.target.closest('[data-open-link]');
+        if (lnk) { const p = String(lnk.dataset.openLink).split(':'); openLinked(p[0], p.slice(1).join(':')); return; }
+        const dayOpen = event.target.closest('[data-day-open]');
+        if (dayOpen) { eventCursor = parseDate(dayOpen.dataset.dayOpen); setCalMode('day'); return; }
+        const slot = event.target.closest('[data-slot-day]');
+        if (slot) { openModal('event'); const sd = slot.dataset.slotDay; if ($('#entry-start')) $('#entry-start').value = sd; if ($('#entry-end')) $('#entry-end').value = sd; if ($('#entry-start-time')) $('#entry-start-time').value = slot.dataset.slotHour + ':00'; return; }
         const nav = event.target.closest('[data-view]'); if (nav) { navTo(nav.dataset.view); return; }
         const go = event.target.closest('[data-go]'); if (go) { navTo(go.dataset.go); return; }
         const action = event.target.closest('[data-action]')?.dataset.action;
@@ -2349,6 +2592,7 @@
         if (action === 'add-event') openModal('event');
         if (action === 'edit-idea') { const b = event.target.closest('[data-edit-id]'); if (b) openIdeaModal(b.dataset.editId); return; }
         if (action === 'edit-task') { const b = event.target.closest('[data-edit-id]'); if (b) openTaskCard(b.dataset.editId); return; }
+        if (action === 'modal-back') { modalBack(); return; }
         if (action === 'expand-text') { toggleTextFull(); return; }
         if (action === 'add-idea') openIdeaModal(null);
         if (action === 'add-folder') addFolder();
