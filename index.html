@@ -285,6 +285,16 @@
 
     .link-open { border: 0; background: none; padding: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: rgba(0,0,0,.25); text-underline-offset: 2px; }
     .link-open:hover { text-decoration-color: currentColor; }
+    .form-grid, .form-field, .read-view, .modal-body, .read-section { min-width: 0; }
+    .form-grid > * { min-width: 0; max-width: 100%; }
+    .modal-body { overflow-x: hidden; }
+    .read-text, .read-meta span, .lr-title, .lr-meta { overflow-wrap: anywhere; word-break: break-word; }
+    .inline-select { min-width: 0; }
+    .inline-select select { min-width: 0; flex: 1 1 auto; }
+    .inline-select .mini-btn { flex: 0 0 34px; }
+    .modal-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .modal-actions > * { flex: 1 1 140px; min-width: 0; }
+    .cal-event { border: 0; width: 100%; text-align: left; cursor: pointer; }
     .modal-backdrop { position: fixed; inset: 0; z-index: 60; display: none; place-items: center; padding: 18px; background: rgba(24,47,62,.5); backdrop-filter: blur(4px); }
     .modal-backdrop.open { display: grid; }
     body.modal-open { overflow: hidden; }
@@ -405,6 +415,10 @@
       .form-grid { grid-template-columns: 1fr; }
       .form-field.full { grid-column: auto; }
       .rec-row { grid-template-columns: 1fr; }
+      .modal-header h2 { font-size: 20px; letter-spacing: -.02em; }
+      .modal-header p { font-size: 10px; }
+      .calendar-cell .cal-event { min-height: 16px; }
+
 
       /* iOS zooms in on inputs smaller than 16px */
       input, select, textarea, .field, .select { font-size: 16px; }
@@ -625,8 +639,6 @@
       <section class="view" id="view-content">
         <div class="view-header"><div><div class="eyebrow">Редакционный поток</div><h2 class="page-title">Контент</h2><p>Смотрите публикации как последовательность, а не как россыпь дедлайнов.</p></div><button class="primary-btn" data-action="add-content">＋ Добавить материал</button></div>
         <div class="filter-bar"><input class="field" id="content-search" type="search" placeholder="Поиск по материалам…" aria-label="Поиск по материалам"><select class="select" id="content-channel-filter" aria-label="Фильтр по каналу"><option value="all">Все каналы</option><option>LinkedIn</option><option>Instagram</option><option>Internal</option><option>Website</option></select><select class="select" id="content-status-filter" aria-label="Фильтр по статусу контента"><option value="all">Все статусы</option><option>Идея</option><option>В работе</option><option>На согласовании</option><option>Запланировано</option><option>Опубликовано</option></select></div>
-        <section class="panel"><div class="panel-header"><div><h2 class="panel-title">Календарь публикаций</h2><div class="panel-subtitle" id="calendar-caption"></div></div><div class="month-nav"><button data-content-month-shift="-1" aria-label="Предыдущий месяц">‹</button><span class="month-label" id="content-month-label"></span><button data-content-month-shift="1" aria-label="Следующий месяц">›</button><button data-content-month-shift="0" aria-label="Текущий месяц">•</button></div></div><div class="calendar-wrap"><div class="calendar-grid" id="calendar-grid"></div></div></section>
-        <div style="height:16px"></div>
         <section class="panel"><div class="panel-header"><div><h2 class="panel-title">Список материалов</h2><div class="panel-subtitle">От идеи до публикации</div></div></div><div class="panel-body"><div class="content-list" id="content-list"></div></div></section>
       </section>
 
@@ -1679,7 +1691,7 @@
             + '<button type="button" class="day-open-btn" data-day-open="' + dIso + '" aria-label="' + (lang === 'de' ? 'Tag öffnen' : 'Открыть день') + ' ' + dIso + '"></button>'
             + (dayEvents.length ? '<span class="cal-dot-count">' + dayEvents.length + '</span>' : '')
             + '<span class="day-number ' + (dIso === isoDate(new Date()) ? 'today' : '') + '">' + day + '</span>'
-            + visible.map(e => '<span class="cal-event ' + (e.type === 'holiday' ? 'teal' : e.type === 'meeting' ? 'violet' : '') + '" data-event-detail="' + e.id + '" title="' + escapeHtml(e.title) + '">' + escapeHtml(e.title) + '</span>').join('')
+            + visible.map(e => '<button type="button" class="cal-event ' + (e.type === 'holiday' ? 'teal' : e.type === 'meeting' ? 'violet' : '') + '" data-event-detail="' + e.id + '" title="' + escapeHtml(e.title) + '">' + escapeHtml(e.title) + '</button>').join('')
             + (more > 0 ? '<span class="cal-more">+' + more + '</span>' : '')
             + '</div>';
         }
@@ -1751,9 +1763,13 @@
       }
       function autoGrow(el) {
         if (!el || !el.style) return;
+        const body = $('#modal-backdrop') && $('#modal-backdrop').querySelector('.modal-body');
+        const keep = body ? body.scrollTop : 0;
+        const prev = el.style.height;
         el.style.height = 'auto';
         const h = el.scrollHeight || 0;
-        if (h) el.style.height = h + 'px';
+        el.style.height = h ? h + 'px' : prev;
+        if (body && typeof body.scrollTop === 'number') body.scrollTop = keep;
       }
       function wrapTextareas() {
         const L = lang === 'de' ? 'Vollbild' : 'Развернуть';
@@ -1782,8 +1798,8 @@
       }
       function readLabels() {
         return lang === 'de'
-          ? { notes:'Notiz', check:'Checkliste', files:'Anhänge', log:'Verlauf', tags:'Schlagworte', empty:'Noch keine Einträge', edit:'Bearbeiten', close:'Schließen', noText:'Kein Text', linkedTasks:'Verknüpfte Aufgaben', linkedEvent:'Verknüpftes Ereignis', sourceIdea:'Idee als Quelle', linkedIdeas:'Verknüpfte Ideen', newTask:'＋ Aufgabe erstellen', newEvent:'＋ Ereignis erstellen', folder:'Ordner', channel:'Kanal', owner:'Verantwortlich', area:'Bereich', due:'Fällig', priority:'Priorität', noDue:'ohne Termin' }
-          : { notes:'Заметка', check:'Чек-лист', files:'Вложения', log:'Журнал', tags:'Теги', empty:'Записей пока нет', edit:'Редактировать', close:'Закрыть', noText:'Текста нет', linkedTasks:'Связанные задачи', linkedEvent:'Связанное событие', sourceIdea:'Идея-источник', linkedIdeas:'Связанные идеи', newTask:'＋ Создать задачу', newEvent:'＋ Создать событие', folder:'Папка', channel:'Канал', owner:'Ответственный', area:'Область', due:'Срок', priority:'Приоритет', noDue:'без срока' };
+          ? { notes:'Notiz', check:'Checkliste', files:'Anhänge', log:'Verlauf', tags:'Schlagworte', empty:'Noch keine Einträge', edit:'Bearbeiten', close:'Schließen', noText:'Kein Text', linkedTasks:'Verknüpfte Aufgaben', linkedEvent:'Verknüpftes Ereignis', sourceIdea:'Idee als Quelle', linkedIdeas:'Verknüpfte Ideen', newTask:'＋ Aufgabe erstellen', newEvent:'＋ Ereignis erstellen', when:'Termin', place:'Ort', duplicate:'Duplizieren', remove:'Löschen', folder:'Ordner', channel:'Kanal', owner:'Verantwortlich', area:'Bereich', due:'Fällig', priority:'Priorität', noDue:'ohne Termin' }
+          : { notes:'Заметка', check:'Чек-лист', files:'Вложения', log:'Журнал', tags:'Теги', empty:'Записей пока нет', edit:'Редактировать', close:'Закрыть', noText:'Текста нет', linkedTasks:'Связанные задачи', linkedEvent:'Связанное событие', sourceIdea:'Идея-источник', linkedIdeas:'Связанные идеи', newTask:'＋ Создать задачу', newEvent:'＋ Создать событие', when:'Когда', place:'Место', duplicate:'Дублировать', remove:'Удалить', folder:'Папка', channel:'Канал', owner:'Ответственный', area:'Область', due:'Срок', priority:'Приоритет', noDue:'без срока' };
       }
       // ---- modal stack + cross links ---------------------------------------
       let modalStack = [];
@@ -1796,13 +1812,14 @@
       function openRecord(kind, id, mode) {
         if (kind === 'task') { mode === 'edit' ? openTaskCard(id) : openTaskView(id); return; }
         if (kind === 'idea') { mode === 'edit' ? openIdeaModal(id) : openIdeaView(id); return; }
-        if (kind === 'event') { showEventDetail(id); return; }
+        if (kind === 'event') { mode === 'edit' ? showEventDetail(id) : openEventView(id); return; }
       }
       function currentFrame() {
         if (currentModal === 'task-view') return { kind: 'task', id: editingTaskId, mode: 'read' };
         if (currentModal === 'task-card') return { kind: 'task', id: editingTaskId, mode: 'edit' };
         if (currentModal === 'idea-view') return { kind: 'idea', id: editingIdeaId, mode: 'read' };
         if (currentModal === 'idea-edit') return { kind: 'idea', id: editingIdeaId, mode: 'edit' };
+        if (currentModal === 'event-view') return { kind: 'event', id: editingEventId, mode: 'read' };
         if (currentModal === 'event-edit') return { kind: 'event', id: editingEventId, mode: 'edit' };
         return null;
       }
@@ -1883,6 +1900,37 @@
           '<button type="button" class="ghost-btn" data-action="close-modal">' + L.close + '</button>'
           + (extra || '')
           + '<button type="button" class="primary-btn" data-action="' + editAction + '" data-edit-id="' + editId + '">✎ ' + L.edit + '</button>';
+      }
+      function eventWhenText(e) {
+        const de = lang === 'de';
+        const d1 = formatDate(e.start, { day:'numeric', month:'long', year:'numeric' });
+        const multi = e.end && e.end > e.start;
+        const d2 = multi ? formatDate(e.end, { day:'numeric', month:'long', year:'numeric' }) : '';
+        const t = (e.startTime ? e.startTime : '') + (e.endTime ? '\u2013' + e.endTime : '');
+        if (e.allDay || !e.startTime) return (multi ? d1 + ' \u2013 ' + d2 : d1) + ' \u00b7 ' + (de ? 'ganzt\u00e4gig' : 'весь день');
+        return (multi ? d1 + ' \u2013 ' + d2 : d1) + (t ? ' \u00b7 ' + t : '');
+      }
+      function openEventView(id) {
+        const e = state.events.find(x => x.id === id); if (!e) return;
+        const L = readLabels();
+        currentModal = 'event-view'; editingEventId = id; editingTaskId = null; editingIdeaId = null;
+        $('#modal-title').textContent = e.title;
+        $('#modal-subtitle').textContent = eventWhenText(e);
+        const meta = [eventTypeLabel(e.type), typeof eventCategoryLabel === 'function' ? eventCategoryLabel(e.category) : '', sourceLabel(e.source), e.location ? L.place + ': ' + e.location : '', recurrenceLabel(e.recurrence)]
+          .filter(Boolean).map(x => '<span>' + escapeHtml(x) + '</span>').join('');
+        const tks = tasksOfEvent(e.id), ids = ideasOfEvent(e.id);
+        let h = '<div class="form-field full read-view"><div class="read-meta">' + meta + '</div>'
+          + readBlock(L.when, '<div class="read-text">' + escapeHtml(eventWhenText(e)) + '</div>')
+          + readBlock(L.notes, readText(e.description, L));
+        if (tks.length) h += readBlock(L.linkedTasks, tks.map(taskLinkHtml).join(''));
+        if (ids.length) h += readBlock(L.linkedIdeas, ids.map(ideaLinkHtml).join(''));
+        h += '<div class="modal-actions"><button type="button" class="ghost-btn" data-event-task="' + e.id + '">' + L.newTask + '</button>'
+          + '<button type="button" class="ghost-btn" data-event-duplicate="' + e.id + '">' + L.duplicate + '</button>'
+          + '<button type="button" class="ghost-btn" data-event-delete="' + e.id + '">' + L.remove + '</button></div>';
+        h += '</div>';
+        $('#form-fields').innerHTML = h;
+        setReadFooter('edit-event', id, L);
+        $('#modal-backdrop').classList.add('open'); afterModalOpen();
       }
       function openIdeaView(id) {
         const idea = state.ideas.find(i => i.id === id); if (!idea) { openIdeaModal(id); return; }
@@ -2576,6 +2624,8 @@
 
       $('#today-chip').textContent = formatLongDate(isoDate(today));
       document.addEventListener('click', (event) => {
+        const evDet = event.target.closest('[data-event-detail]');
+        if (evDet) { openLinked('event', evDet.dataset.eventDetail); return; }
         const lnk = event.target.closest('[data-open-link]');
         if (lnk) { const p = String(lnk.dataset.openLink).split(':'); openLinked(p[0], p.slice(1).join(':')); return; }
         const dayOpen = event.target.closest('[data-day-open]');
@@ -2592,6 +2642,7 @@
         if (action === 'add-event') openModal('event');
         if (action === 'edit-idea') { const b = event.target.closest('[data-edit-id]'); if (b) openIdeaModal(b.dataset.editId); return; }
         if (action === 'edit-task') { const b = event.target.closest('[data-edit-id]'); if (b) openTaskCard(b.dataset.editId); return; }
+        if (action === 'edit-event') { const b = event.target.closest('[data-edit-id]'); if (b) { const k = modalStack.slice(); k.push({ kind:'event', id:b.dataset.editId, mode:'read' }); showEventDetail(b.dataset.editId); modalStack = k; renderModalBack(); } return; }
         if (action === 'modal-back') { modalBack(); return; }
         if (action === 'expand-text') { toggleTextFull(); return; }
         if (action === 'add-idea') openIdeaModal(null);
@@ -2663,7 +2714,6 @@
         const ideaEv = event.target.closest('[data-idea-event]'); if (ideaEv) { createEventFromIdea(ideaEv.dataset.ideaEvent); return; }
         const ideaTk = event.target.closest('[data-idea-task]'); if (ideaTk) { createTaskFromIdea(ideaTk.dataset.ideaTask); return; }
         const ideaOpen = event.target.closest('[data-idea-open]'); if (ideaOpen) { openIdeaView(ideaOpen.dataset.ideaOpen); return; }
-        const eventDetail = event.target.closest('[data-event-detail]'); if (eventDetail) showEventDetail(eventDetail.dataset.eventDetail);
       });
       $('#entry-form').addEventListener('submit', handleSubmit);
       $('#modal-backdrop').addEventListener('click', (event) => { if (event.target === $('#modal-backdrop')) closeModal(); });
