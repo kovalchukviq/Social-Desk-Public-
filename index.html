@@ -126,6 +126,26 @@
     .rec-day input { margin: 0; }
     .rec-preview { margin: 0; font-size: 12px; color: var(--muted); }
     .card-list { display: grid; gap: 6px; margin-bottom: 8px; }
+    .sync-badge { display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 999px; font-size: 11px; }
+    .sync-badge.ok { background: var(--cadenabbia-100); color: var(--cadenabbia-600); }
+    .sync-badge.warn { background: var(--union-gold-soft); color: #7A6300; }
+    .sync-badge.busy { background: #E8EEF1; color: var(--rhoendorf-700); }
+    .sync-badge.off { background: #EDF3F4; color: var(--muted); }
+    .read-view { font-size: 15px; line-height: 1.65; }
+    .read-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+    .read-meta span { padding: 4px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: 11px; }
+    .read-section { margin-bottom: 18px; }
+    .read-section h4 { margin: 0 0 7px; color: var(--muted); font-size: 10px; letter-spacing: .09em; text-transform: uppercase; }
+    .read-text { max-width: 68ch; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .read-empty { color: var(--muted); font-size: 13px; }
+    .read-check { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; }
+    .read-check.done span { color: var(--muted); text-decoration: line-through; }
+    .grow-wrap { position: relative; }
+    .grow-wrap textarea { min-height: 108px; max-height: 60vh; resize: vertical; overflow-y: auto; }
+    .expand-btn { position: absolute; top: -26px; right: 0; padding: 2px 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--muted); font-size: 11px; }
+    .modal.text-full { width: min(100%, 100%); max-height: 100vh; }
+    .modal.text-full .form-field:not(.keep) { display: none; }
+    .modal.text-full .grow-wrap textarea { max-height: none; height: 62vh; }
     .card-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); font-size: 13px; }
     .card-line span.done { text-decoration: line-through; color: var(--muted); }
     .card-line em { color: var(--muted); font-style: normal; font-size: 11px; }
@@ -288,23 +308,23 @@
       .brand { padding: 0 2px 10px; }
       .side-label, .sidebar-spacer, .storage-card { display: none; }
 
-      /* bottom tab bar instead of a scrolling strip */
+      /* top tab bar: icons stay, dark background, sticky under the brand */
+      .sidebar { position: sticky; top: 0; z-index: 12; }
       .nav {
-        position: fixed; left: 0; right: 0; bottom: 0; z-index: 12;
-        display: grid; grid-template-columns: repeat(7, 1fr); gap: 0;
-        margin: 0; padding: 4px 2px calc(4px + env(safe-area-inset-bottom));
-        border-top: 1px solid var(--line); background: var(--paper);
-        box-shadow: 0 -4px 18px rgba(24,47,62,.10);
+        display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+        margin: 0; padding: 0;
       }
       .nav button {
         display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-        width: 100%; min-height: 50px; padding: 5px 1px; border-radius: 8px;
+        width: 100%; min-height: 48px; padding: 5px 1px; border-radius: 8px;
+        color: #D6E3E9; background: transparent;
         font-size: 9px; line-height: 1.1; letter-spacing: 0; text-align: center;
       }
+      .nav button.active { background: #FFFFFF; color: var(--ink); font-weight: 750; }
       .nav button span:not(.nav-icon) { overflow: hidden; max-width: 100%; text-overflow: ellipsis; white-space: nowrap; }
       .nav-icon { width: auto; font-size: 16px; }
 
-      .main { padding: 16px 13px 84px; }
+      .main { padding: 16px 13px 28px; }
       .topbar, .dashboard-intro, .view-header { align-items: stretch; flex-direction: column; gap: 10px; margin-bottom: 18px; }
       .top-actions { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
       .top-actions .primary-btn { flex: 1 1 100%; order: 3; }
@@ -500,7 +520,7 @@
   
     @supports (padding: env(safe-area-inset-bottom)) {
       body { padding-bottom: env(safe-area-inset-bottom); }
-      .sidebar { padding-top: calc(14px + env(safe-area-inset-top)); }
+      .sidebar { padding-top: calc(14px + env(safe-area-inset-top)); padding-bottom: 8px; }
     }
   </style>
 
@@ -604,7 +624,7 @@
 
       <section class="view" id="view-data">
         <div class="view-header"><div><div class="eyebrow">Локальное хранение</div><h2 class="page-title">Данные</h2><p>Переносите рабочее пространство между компьютерами через один JSON-файл.</p></div></div>
-        <div class="data-layout"><section class="data-card"><h3>Ручная синхронизация</h3><p>Приложение не подключается к API и не отправляет данные в интернет. Экспортируйте файл в общую папку OneDrive и импортируйте актуальную версию перед началом работы.</p><div class="data-actions"><button class="primary-btn" data-action="export">↥ Экспортировать JSON</button><button class="ghost-btn" data-action="import">↧ Импортировать JSON</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить календарь</button><button class="ghost-btn" data-action="reset-workspace">↺ Сбросить всё</button></div><div class="notice">Совет: перед импортом сохраните собственный экспорт. При одновременной работе сотрудников используйте договорённость «один редактор — одна версия файла».</div></section><section class="data-card"><h3 data-i18n="sync.title">Синхронизация с GitHub</h3><p data-i18n="sync.sub">Приватный репозиторий хранит state.json и вложения. Токен остаётся на этом устройстве.</p><div class="form-grid"><label class="form-field"><span data-i18n="sync.owner">Владелец</span><input class="field" id="gh-owner" placeholder="username"></label><label class="form-field"><span data-i18n="sync.repo">Репозиторий</span><input class="field" id="gh-repo" placeholder="social-desk-data"></label><label class="form-field"><span data-i18n="sync.branch">Ветка</span><input class="field" id="gh-branch" placeholder="main"></label><label class="form-field"><span data-i18n="sync.token">Токен доступа</span><input class="field" id="gh-token" type="password" autocomplete="off" placeholder="github_pat_…"></label></div><div class="data-actions"><button class="ghost-btn" data-action="gh-save" data-i18n="sync.save">Сохранить доступ</button><button class="ghost-btn" data-action="gh-check" data-i18n="sync.check">✓ Проверить токен</button><button class="primary-btn" data-action="gh-push" data-i18n="sync.push">↥ Выгрузить в GitHub</button><button class="ghost-btn" data-action="gh-pull" data-i18n="sync.pull">↧ Загрузить из GitHub</button><button class="ghost-btn" data-action="gh-forget" data-i18n="sync.forget">✗ Забыть токен</button><button class="ghost-btn" data-action="export-bundle" data-i18n="sync.zip">↥ Резервная копия ZIP</button></div><div class="notice"><span id="gh-repo-label"></span> · <span id="gh-token-hint"></span></div><div class="notice" id="gh-status" role="status"></div></section><section class="data-card"><h3 data-i18n="storage.health">Надёжность хранения</h3><p id="storage-health-note" data-i18n="storage.note">Проверка…</p><div class="data-actions"><span class="storage-flag warn" id="storage-flag">…</span><button class="ghost-btn" data-action="request-persist" data-i18n="storage.request">Закрепить хранилище</button><button class="ghost-btn" data-action="restore-snapshot" data-i18n="storage.restore">Восстановить из снимка</button></div></section><section class="data-card"><h3>Текущее содержимое</h3><p>Предпросмотр локального набора данных.</p><pre class="data-preview" id="data-preview"></pre></section></div>
+        <div class="data-layout"><section class="data-card"><h3>Ручная синхронизация</h3><p>Приложение не подключается к API и не отправляет данные в интернет. Экспортируйте файл в общую папку OneDrive и импортируйте актуальную версию перед началом работы.</p><div class="data-actions"><button class="primary-btn" data-action="export">↥ Экспортировать JSON</button><button class="ghost-btn" data-action="import">↧ Импортировать JSON</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить календарь</button><button class="ghost-btn" data-action="reset-workspace">↺ Сбросить всё</button></div><div class="notice">Совет: перед импортом сохраните собственный экспорт. При одновременной работе сотрудников используйте договорённость «один редактор — одна версия файла».</div></section><section class="data-card"><h3 data-i18n="sync.title">Синхронизация с GitHub</h3><p data-i18n="sync.sub">Приватный репозиторий хранит state.json и вложения. Токен остаётся на этом устройстве.</p><div class="form-grid"><label class="form-field"><span data-i18n="sync.owner">Владелец</span><input class="field" id="gh-owner" placeholder="username"></label><label class="form-field"><span data-i18n="sync.repo">Репозиторий</span><input class="field" id="gh-repo" placeholder="social-desk-data"></label><label class="form-field"><span data-i18n="sync.branch">Ветка</span><input class="field" id="gh-branch" placeholder="main"></label><label class="form-field"><span data-i18n="sync.mode">Режим выгрузки</span><select class="select" id="gh-mode"><option value="manual" data-i18n="sync.modeManual">Вручную</option><option value="auto" data-i18n="sync.modeAuto">Автоматически после изменений</option><option value="daily" data-i18n="sync.modeDaily">Раз в день при открытии</option></select></label><label class="form-field"><span data-i18n="sync.token">Токен доступа</span><input class="field" id="gh-token" type="password" autocomplete="off" placeholder="github_pat_…"></label></div><div class="data-actions"><button class="ghost-btn" data-action="gh-save" data-i18n="sync.save">Сохранить доступ</button><button class="ghost-btn" data-action="gh-check" data-i18n="sync.check">✓ Проверить токен</button><button class="ghost-btn" data-action="gh-test" data-i18n="sync.test">⚑ Пробная выгрузка</button><button class="primary-btn" data-action="gh-push" data-i18n="sync.push">↥ Выгрузить в GitHub</button><button class="ghost-btn" data-action="gh-pull" data-i18n="sync.pull">↧ Загрузить из GitHub</button><button class="ghost-btn" data-action="gh-forget" data-i18n="sync.forget">✗ Забыть токен</button><button class="ghost-btn" data-action="export-bundle" data-i18n="sync.zip">↥ Резервная копия ZIP</button></div><div class="notice"><span class="sync-badge off" id="sync-badge">○</span> <span id="gh-repo-label"></span> · <span id="gh-token-hint"></span></div><div class="notice" id="gh-status" role="status"></div></section><section class="data-card"><h3 data-i18n="storage.health">Надёжность хранения</h3><p id="storage-health-note" data-i18n="storage.note">Проверка…</p><div class="data-actions"><span class="storage-flag warn" id="storage-flag">…</span><button class="ghost-btn" data-action="request-persist" data-i18n="storage.request">Закрепить хранилище</button><button class="ghost-btn" data-action="restore-snapshot" data-i18n="storage.restore">Восстановить из снимка</button></div></section><section class="data-card"><h3>Текущее содержимое</h3><p>Предпросмотр локального набора данных.</p><pre class="data-preview" id="data-preview"></pre></section></div>
       </section>
     </main>
   </div>
@@ -629,6 +649,13 @@
       const IDB_BLOBS = 'blobs';
       const GH_TOKEN_KEY = 'social-desk-gh-token';
       const GH_CFG_KEY = 'social-desk-gh-config';
+      const GH_MODE_KEY = 'social-desk-gh-mode';
+      const GH_SHA_KEY = 'social-desk-gh-sha';
+      const GH_LASTSYNC_KEY = 'social-desk-gh-lastsync';
+      const AUTOSYNC_DEBOUNCE = 60 * 1000;
+      const AUTOSYNC_MIN_GAP = 5 * 60 * 1000;
+      let autoTimer = null;
+      let syncing = false;
       const MAX_ATTACHMENT = 25 * 1024 * 1024;
       const SNAPSHOT_MAX = 5;
       const BACKUP_REMIND_DAYS = 7;
@@ -888,8 +915,11 @@
         if (status === 422) return lang === 'de' ? '422 — Datei zu groß oder ungültiger Pfad.' : '422 — файл слишком большой или неверный путь.';
         return 'GitHub ' + status;
       }
-      async function ghPush() {
+      async function ghPush(opts) {
+        opts = opts || {};
         if (!ghReady()) { showToast(lang === 'de' ? 'Bitte zuerst Repository und Token speichern' : 'Сначала сохраните репозиторий и токен'); navTo('data'); return; }
+        if (syncing) return;
+        syncing = true; renderSyncBadge();
         setSyncStatus(lang === 'de' ? 'Synchronisierung läuft…' : 'Синхронизация…');
         try {
           const enc = new TextEncoder();
@@ -902,16 +932,27 @@
             await ghPut('attachments/' + a.id, u8, 'attachment ' + a.name);
             a.remote = true;
           }
-          await ghPut('state.json', enc.encode(JSON.stringify(state, null, 2)), 'state ' + new Date().toISOString());
+          const remote = await ghGet('state.json');
+          if (remote && knownSha() && remote.sha !== knownSha()) {
+            if (!conflictChoice()) {
+              setSyncStatus(lang === 'de' ? '⚠ Konflikt — Upload abgebrochen' : '⚠ Конфликт — выгрузка прервана');
+              syncing = false; renderSyncBadge();
+              return;
+            }
+          }
+          const put = await ghPut('state.json', enc.encode(JSON.stringify(state, null, 2)), 'state ' + new Date().toISOString());
+          if (put && put.content && put.content.sha) setKnownSha(put.content.sha);
           try { localStorage.setItem(LASTEXPORT_KEY, String(Date.now())); } catch (e) {}
           persistQuiet();
+          markSynced();
           setSyncStatus((lang === 'de' ? 'Gesichert: ' : 'Сохранено: ') + new Date().toLocaleString(lang === 'de' ? 'de-DE' : 'ru-RU'));
-          showToast(lang === 'de' ? 'In GitHub gesichert' : 'Выгружено в GitHub');
+          if (!opts.silent) showToast(lang === 'de' ? 'In GitHub gesichert' : 'Выгружено в GitHub');
           renderStorageHealth();
         } catch (err) {
           setSyncStatus((lang === 'de' ? 'Fehler: ' : 'Ошибка: ') + err.message);
-          showToast(lang === 'de' ? 'Sync fehlgeschlagen' : 'Синхронизация не удалась');
+          if (!opts.silent) showToast(lang === 'de' ? 'Sync fehlgeschlagen' : 'Синхронизация не удалась');
         }
+        syncing = false; renderSyncBadge();
       }
       async function ghPull() {
         if (!ghReady()) { showToast(lang === 'de' ? 'Bitte zuerst Repository und Token speichern' : 'Сначала сохраните репозиторий и токен'); navTo('data'); return; }
@@ -934,6 +975,8 @@
             if (okB) a.blobId = a.blobId || a.id;
           }
           persist();
+          setKnownSha(meta.sha || '');
+          markSynced();
           renderAll();
           setSyncStatus((lang === 'de' ? 'Geladen: ' : 'Загружено: ') + new Date().toLocaleString(lang === 'de' ? 'de-DE' : 'ru-RU'));
           showToast(lang === 'de' ? 'Aus GitHub wiederhergestellt' : 'Восстановлено из GitHub');
@@ -948,6 +991,7 @@
         if (hint) hint.textContent = tokenHint();
         const el = $('#gh-repo-label');
         if (el) el.textContent = ghReady() ? c.owner + '/' + c.repo + ' · ' + ghBranch() : (lang === 'de' ? 'Nicht verbunden' : 'Не подключено');
+        renderSyncBadge();
       }
       function cleanToken(t) { return String(t || '').replace(/\s+/g, ''); }
       function cleanOwner(t) {
@@ -1014,6 +1058,65 @@
       function forgetGh() {
         try { localStorage.removeItem(GH_TOKEN_KEY); localStorage.removeItem(GH_CFG_KEY); } catch (e) {}
         renderSyncPanel(); setSyncStatus(lang === 'de' ? 'Zugang entfernt' : 'Доступ удалён');
+      }
+      function syncMode() { try { return localStorage.getItem(GH_MODE_KEY) || 'manual'; } catch (e) { return 'manual'; } }
+      function setSyncMode(m) { try { localStorage.setItem(GH_MODE_KEY, m); } catch (e) {} renderSyncPanel(); scheduleAutoSync(); }
+      function lastSyncAt() { const v = Number(localStorage.getItem(GH_LASTSYNC_KEY) || 0); return isNaN(v) ? 0 : v; }
+      function markSynced() { try { localStorage.setItem(GH_LASTSYNC_KEY, String(Date.now())); } catch (e) {} renderSyncBadge(); }
+      function knownSha() { try { return localStorage.getItem(GH_SHA_KEY) || ''; } catch (e) { return ''; } }
+      function setKnownSha(sha) { try { localStorage.setItem(GH_SHA_KEY, sha || ''); } catch (e) {} }
+      function hasUnsyncedChanges() {
+        const upd = state && state.updatedAt ? Date.parse(state.updatedAt) : 0;
+        return !!upd && upd > lastSyncAt();
+      }
+      function isOnline() { return typeof navigator === 'undefined' || navigator.onLine !== false; }
+      function renderSyncBadge() {
+        const el = $('#sync-badge');
+        if (!el) return;
+        if (!ghReady()) { el.textContent = lang === 'de' ? '○ nicht verbunden' : '○ не подключено'; el.className = 'sync-badge off'; return; }
+        if (syncing) { el.textContent = lang === 'de' ? '◍ Synchronisierung…' : '◍ синхронизация…'; el.className = 'sync-badge busy'; return; }
+        if (!isOnline()) { el.textContent = lang === 'de' ? '◍ wartet auf Netz' : '◍ ожидает сети'; el.className = 'sync-badge busy'; return; }
+        if (hasUnsyncedChanges()) { el.textContent = lang === 'de' ? '● nicht gesichert' : '● есть несохранённые'; el.className = 'sync-badge warn'; return; }
+        el.textContent = lang === 'de' ? '● gesichert' : '● синхронизировано';
+        el.className = 'sync-badge ok';
+      }
+      function scheduleAutoSync() {
+        if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+        if (syncMode() !== 'auto' || !ghReady()) return;
+        autoTimer = setTimeout(() => {
+          autoTimer = null;
+          if (!hasUnsyncedChanges()) return;
+          if (Date.now() - lastSyncAt() < AUTOSYNC_MIN_GAP) { autoTimer = setTimeout(scheduleAutoSync, AUTOSYNC_MIN_GAP); return; }
+          if (!isOnline()) { renderSyncBadge(); return; }
+          ghPush({ silent: true });
+        }, AUTOSYNC_DEBOUNCE);
+      }
+      function dailySyncCheck() {
+        if (!ghReady()) return;
+        const mode = syncMode();
+        if (mode !== 'daily' && mode !== 'auto') return;
+        const last = lastSyncAt();
+        if (!last) { if (hasUnsyncedChanges()) ghPush({ silent: true }); return; }
+        const d1 = new Date(last), d2 = new Date();
+        const sameDay = d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+        if (!sameDay && hasUnsyncedChanges() && isOnline()) ghPush({ silent: true });
+      }
+      async function ghTestPush() {
+        if (!ghReady()) { showToast(lang === 'de' ? 'Zuerst Zugang speichern' : 'Сначала сохраните доступ'); return; }
+        setSyncStatus(lang === 'de' ? 'Testlauf…' : 'Пробная выгрузка…');
+        try {
+          const payload = JSON.stringify({ ping: new Date().toISOString(), app: 'social-desk' }, null, 2);
+          await ghPut('test/ping.json', new TextEncoder().encode(payload), 'test ping');
+          setSyncStatus(lang === 'de' ? '✓ Testlauf erfolgreich — test/ping.json geschrieben' : '✓ Пробная выгрузка удалась — записан test/ping.json');
+        } catch (err) {
+          setSyncStatus((lang === 'de' ? '✗ Testlauf: ' : '✗ Пробная выгрузка: ') + err.message);
+        }
+      }
+      function conflictChoice() {
+        const msg = lang === 'de'
+          ? 'Im Repository liegt eine neuere Kopie von einem anderen Gerät.\n\nOK = lokale Version hochladen und überschreiben\nAbbrechen = Upload stoppen (dann „Von GitHub laden“ drücken)'
+          : 'В репозитории лежит более новая копия с другого устройства.\n\nOK — выгрузить локальную версию поверх\nОтмена — прервать выгрузку (затем нажмите «Загрузить из GitHub»)';
+        return confirm(msg);
       }
       function writeState(obj) {
         const json = JSON.stringify(obj);
@@ -1126,11 +1229,11 @@
       const translations = {
         ru: {
           'app.eyebrow':'Социальные медиа · control room', 'nav.overview':'Обзор', 'nav.tasks':'Задачи', 'nav.content':'Контент', 'nav.meetings':'Встречи', 'nav.calendar':'Календарь', 'nav.ideas':'Идеи', 'ideas.eyebrow':'Банк идей', 'ideas.title':'Идеи контента', 'ideas.intro':'Складывайте идеи в папки. Связь с календарём — только вручную.', 'ideas.add':'＋ Новая идея', 'ideas.folders':'Папки', 'ideas.foldersSub':'Один уровень. Удаление папки не удаляет идеи.', 'ideas.list':'Идеи', 'ideas.channels':'Каналы', 'ideas.channelsSub':'Список редактируемый: добавляйте, переименовывайте и удаляйте каналы.', 'ideas.disk':'Папка на диске', 'ideas.diskSub':'Подключите папку один раз — приложение создаст подпапку для каждой идеи с заметками и вложениями.', 'nav.data':'Данные', 'actions.add':'＋ Добавить', 'actions.reset':'Сбросить',
-          'calendar.eyebrow':'Локальный календарь', 'calendar.title':'Календарь', 'calendar.intro':'Импортируйте Outlook, праздники и задачи пакетно — без API и без отправки данных наружу.', 'calendar.addEvent':'＋ Новое событие', 'calendar.importIcs':'↧ Импорт ICS', 'calendar.importCsv':'↧ Импорт CSV', 'calendar.exportIcs':'↥ Экспорт ICS', 'calendar.monthView':'Календарь событий', 'calendar.eventList':'Список событий', 'calendar.eventListSub':'Откройте событие, чтобы создать задачу или запланировать дальнейшее действие.', 'calendar.modeGroup':'Режим календаря', 'calendar.prev':'Назад', 'calendar.next':'Вперёд', 'calendar.today':'Сегодня', 'calendar.modeDay':'День', 'calendar.modeWeek':'Неделя', 'calendar.modeMonth':'Месяц', 'backup.now':'Экспортировать', 'backup.later':'Позже', 'storage.health':'Надёжность хранения', 'storage.note':'Проверка…', 'storage.request':'Закрепить хранилище', 'storage.restore':'Восстановить из снимка', 'sync.check':'✓ Проверить токен', 'sync.title':'Синхронизация с GitHub', 'sync.sub':'Приватный репозиторий хранит state.json и вложения. Токен остаётся на этом устройстве.', 'sync.owner':'Владелец', 'sync.repo':'Репозиторий', 'sync.branch':'Ветка', 'sync.token':'Токен доступа', 'sync.save':'Сохранить доступ', 'sync.push':'↥ Выгрузить в GitHub', 'sync.pull':'↧ Загрузить из GitHub', 'sync.forget':'✗ Забыть токен', 'sync.zip':'↥ Резервная копия ZIP'
+          'calendar.eyebrow':'Локальный календарь', 'calendar.title':'Календарь', 'calendar.intro':'Импортируйте Outlook, праздники и задачи пакетно — без API и без отправки данных наружу.', 'calendar.addEvent':'＋ Новое событие', 'calendar.importIcs':'↧ Импорт ICS', 'calendar.importCsv':'↧ Импорт CSV', 'calendar.exportIcs':'↥ Экспорт ICS', 'calendar.monthView':'Календарь событий', 'calendar.eventList':'Список событий', 'calendar.eventListSub':'Откройте событие, чтобы создать задачу или запланировать дальнейшее действие.', 'calendar.modeGroup':'Режим календаря', 'calendar.prev':'Назад', 'calendar.next':'Вперёд', 'calendar.today':'Сегодня', 'calendar.modeDay':'День', 'calendar.modeWeek':'Неделя', 'calendar.modeMonth':'Месяц', 'backup.now':'Экспортировать', 'backup.later':'Позже', 'storage.health':'Надёжность хранения', 'storage.note':'Проверка…', 'storage.request':'Закрепить хранилище', 'storage.restore':'Восстановить из снимка', 'sync.check':'✓ Проверить токен', 'sync.test':'⚑ Пробная выгрузка', 'sync.mode':'Режим выгрузки', 'sync.modeManual':'Вручную', 'sync.modeAuto':'Автоматически после изменений', 'sync.modeDaily':'Раз в день при открытии', 'sync.title':'Синхронизация с GitHub', 'sync.sub':'Приватный репозиторий хранит state.json и вложения. Токен остаётся на этом устройстве.', 'sync.owner':'Владелец', 'sync.repo':'Репозиторий', 'sync.branch':'Ветка', 'sync.token':'Токен доступа', 'sync.save':'Сохранить доступ', 'sync.push':'↥ Выгрузить в GitHub', 'sync.pull':'↧ Загрузить из GitHub', 'sync.forget':'✗ Забыть токен', 'sync.zip':'↥ Резервная копия ZIP'
         },
         de: {
           'app.eyebrow':'Social Media · Control Room', 'nav.overview':'Übersicht', 'nav.tasks':'Aufgaben', 'nav.content':'Content', 'nav.meetings':'Meetings', 'nav.calendar':'Kalender', 'nav.ideas':'Ideen', 'ideas.eyebrow':'Ideenspeicher', 'ideas.title':'Content-Ideen', 'ideas.intro':'Ideen in Ordnern sammeln. Kalenderverknüpfung nur manuell.', 'ideas.add':'＋ Neue Idee', 'ideas.folders':'Ordner', 'ideas.foldersSub':'Eine Ebene. Das Löschen eines Ordners löscht keine Ideen.', 'ideas.list':'Ideen', 'ideas.channels':'Kanäle', 'ideas.channelsSub':'Die Liste ist bearbeitbar: Kanäle hinzufügen, umbenennen und entfernen.', 'ideas.disk':'Ordner auf der Festplatte', 'ideas.diskSub':'Ordner einmal verbinden — die Anwendung legt für jede Idee einen Unterordner mit Notizen und Anhängen an.', 'nav.data':'Daten', 'actions.add':'＋ Hinzufügen', 'actions.reset':'Zurücksetzen',
-          'calendar.eyebrow':'Lokaler Kalender', 'calendar.title':'Kalender', 'calendar.intro':'Outlook, Feiertage und Aufgaben gesammelt importieren — ohne API und ohne Datenübertragung.', 'calendar.addEvent':'＋ Neues Ereignis', 'calendar.importIcs':'↧ ICS importieren', 'calendar.importCsv':'↧ CSV importieren', 'calendar.exportIcs':'↥ ICS exportieren', 'calendar.monthView':'Ereigniskalender', 'calendar.eventList':'Ereignisliste', 'calendar.eventListSub':'Ereignis öffnen, Aufgabe erstellen oder nächste Aktion planen.', 'calendar.modeGroup':'Kalenderansicht', 'calendar.prev':'Zurück', 'calendar.next':'Weiter', 'calendar.today':'Heute', 'calendar.modeDay':'Tag', 'calendar.modeWeek':'Woche', 'calendar.modeMonth':'Monat', 'backup.now':'Exportieren', 'backup.later':'Später', 'storage.health':'Speichersicherheit', 'storage.note':'Prüfung…', 'storage.request':'Speicher dauerhaft machen', 'storage.restore':'Aus Snapshot wiederherstellen', 'sync.check':'✓ Token prüfen', 'sync.title':'Synchronisierung mit GitHub', 'sync.sub':'Ein privates Repository speichert state.json und Anhänge. Das Token bleibt auf diesem Gerät.', 'sync.owner':'Eigentümer', 'sync.repo':'Repository', 'sync.branch':'Branch', 'sync.token':'Zugriffstoken', 'sync.save':'Zugang speichern', 'sync.push':'↥ Zu GitHub hochladen', 'sync.pull':'↧ Von GitHub laden', 'sync.forget':'✗ Token löschen', 'sync.zip':'↥ Backup als ZIP'
+          'calendar.eyebrow':'Lokaler Kalender', 'calendar.title':'Kalender', 'calendar.intro':'Outlook, Feiertage und Aufgaben gesammelt importieren — ohne API und ohne Datenübertragung.', 'calendar.addEvent':'＋ Neues Ereignis', 'calendar.importIcs':'↧ ICS importieren', 'calendar.importCsv':'↧ CSV importieren', 'calendar.exportIcs':'↥ ICS exportieren', 'calendar.monthView':'Ereigniskalender', 'calendar.eventList':'Ereignisliste', 'calendar.eventListSub':'Ereignis öffnen, Aufgabe erstellen oder nächste Aktion planen.', 'calendar.modeGroup':'Kalenderansicht', 'calendar.prev':'Zurück', 'calendar.next':'Weiter', 'calendar.today':'Heute', 'calendar.modeDay':'Tag', 'calendar.modeWeek':'Woche', 'calendar.modeMonth':'Monat', 'backup.now':'Exportieren', 'backup.later':'Später', 'storage.health':'Speichersicherheit', 'storage.note':'Prüfung…', 'storage.request':'Speicher dauerhaft machen', 'storage.restore':'Aus Snapshot wiederherstellen', 'sync.check':'✓ Token prüfen', 'sync.test':'⚑ Testlauf', 'sync.mode':'Upload-Modus', 'sync.modeManual':'Manuell', 'sync.modeAuto':'Automatisch nach Änderungen', 'sync.modeDaily':'Täglich beim Öffnen', 'sync.title':'Synchronisierung mit GitHub', 'sync.sub':'Ein privates Repository speichert state.json und Anhänge. Das Token bleibt auf diesem Gerät.', 'sync.owner':'Eigentümer', 'sync.repo':'Repository', 'sync.branch':'Branch', 'sync.token':'Zugriffstoken', 'sync.save':'Zugang speichern', 'sync.push':'↥ Zu GitHub hochladen', 'sync.pull':'↧ Von GitHub laden', 'sync.forget':'✗ Token löschen', 'sync.zip':'↥ Backup als ZIP'
         }
       };
       const ruDeText = {
@@ -1262,6 +1365,8 @@
         if (!writeState(state)) showToast(lang === 'de' ? 'Browser erlaubt kein lokales Speichern' : 'Браузер не разрешил локальное сохранение');
         pushSnapshot(state);
         renderAll();
+        scheduleAutoSync();
+        renderSyncBadge();
       }
       function showToast(message) {
         const el = $('#toast'); el.textContent = lang === 'de' ? localizeString(message) : message; el.classList.add('show');
@@ -1526,6 +1631,104 @@
         if (activeFolder === id) activeFolder = 'all';
         persist(); showToast(lang === 'de' ? 'Ordner gelöscht' : 'Папка удалена');
       }
+      function autoGrow(el) {
+        if (!el || !el.style) return;
+        el.style.height = 'auto';
+        const h = el.scrollHeight || 0;
+        if (h) el.style.height = h + 'px';
+      }
+      function wrapTextareas() {
+        const L = lang === 'de' ? 'Vollbild' : 'Развернуть';
+        $$('#form-fields textarea').forEach(ta => {
+          const field = ta.closest ? ta.closest('.form-field') : null;
+          if (!field || field.dataset.grown) return;
+          field.dataset.grown = '1';
+          field.classList.add('grow-wrap', 'keep');
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'expand-btn';
+          btn.setAttribute('data-action', 'expand-text');
+          btn.textContent = '⤢ ' + L;
+          field.appendChild(btn);
+          ta.addEventListener('input', () => autoGrow(ta));
+          autoGrow(ta);
+        });
+      }
+      function toggleTextFull() {
+        const modal = $('#modal-backdrop') && $('#modal-backdrop').querySelector('.modal');
+        if (!modal) return;
+        const on = modal.classList.contains('text-full');
+        if (on) modal.classList.remove('text-full'); else modal.classList.add('text-full');
+        const ta = $('#form-fields textarea');
+        if (ta) { autoGrow(ta); if (ta.focus) ta.focus(); }
+      }
+      function readLabels() {
+        return lang === 'de'
+          ? { notes:'Notiz', check:'Checkliste', files:'Anhänge', log:'Verlauf', tags:'Schlagworte', empty:'Noch keine Einträge', edit:'Bearbeiten', close:'Schließen', noText:'Kein Text', folder:'Ordner', channel:'Kanal', owner:'Verantwortlich', area:'Bereich', due:'Fällig', priority:'Priorität', noDue:'ohne Termin' }
+          : { notes:'Заметка', check:'Чек-лист', files:'Вложения', log:'Журнал', tags:'Теги', empty:'Записей пока нет', edit:'Редактировать', close:'Закрыть', noText:'Текста нет', folder:'Папка', channel:'Канал', owner:'Ответственный', area:'Область', due:'Срок', priority:'Приоритет', noDue:'без срока' };
+      }
+      function readBlock(title, inner) { return '<div class="read-section"><h4>' + title + '</h4>' + inner + '</div>'; }
+      function readText(value, L) {
+        const v = String(value || '').trim();
+        return v ? '<div class="read-text">' + escapeHtml(v) + '</div>' : '<div class="read-empty">' + L.noText + '</div>';
+      }
+      function readChecklist(list, L) {
+        if (!list || !list.length) return '<div class="read-empty">' + L.empty + '</div>';
+        return list.map(c => '<div class="read-check ' + (c.done ? 'done' : '') + '"><span aria-hidden="true">' + (c.done ? '☑' : '☐') + '</span><span>' + escapeHtml(c.text) + '</span></div>').join('');
+      }
+      function readAttachments(list, L) {
+        if (!list || !list.length) return '<div class="read-empty">' + L.empty + '</div>';
+        return list.map(a => '<div class="card-line"><span>' + (a.kind === 'link' ? '🔗' : '📎') + ' ' + attachmentLinkHtml(a) + (a.size ? ' <em>' + Math.round(a.size / 1024) + ' KB</em>' : '') + '</span></div>').join('');
+      }
+      function readLog(list, L) {
+        if (!list || !list.length) return '<div class="read-empty">' + L.empty + '</div>';
+        return list.slice().reverse().map(l => '<div class="card-line"><span><em>' + new Date(l.at).toLocaleString(lang === 'de' ? 'de-DE' : 'ru-RU') + '</em> — ' + escapeHtml(l.text) + '</span></div>').join('');
+      }
+      function setReadFooter(editAction, editId, L, extra) {
+        $('#entry-form').querySelector('.modal-footer').innerHTML =
+          '<button type="button" class="ghost-btn" data-action="close-modal">' + L.close + '</button>'
+          + (extra || '')
+          + '<button type="button" class="primary-btn" data-action="' + editAction + '" data-edit-id="' + editId + '">✎ ' + L.edit + '</button>';
+      }
+      function openIdeaView(id) {
+        const idea = state.ideas.find(i => i.id === id); if (!idea) { openIdeaModal(id); return; }
+        const L = readLabels();
+        currentModal = 'idea-view'; editingIdeaId = id; editingTaskId = null; editingEventId = null;
+        $('#modal-title').textContent = idea.title;
+        $('#modal-subtitle').textContent = ideaStatusLabel(idea.status) + ' · ' + folderName(idea.folderId);
+        const meta = [ideaStatusLabel(idea.status), idea.channel ? L.channel + ': ' + idea.channel : '', L.folder + ': ' + folderName(idea.folderId)]
+          .concat((idea.tags || []).map(t => '#' + t)).filter(Boolean)
+          .map(x => '<span>' + escapeHtml(x) + '</span>').join('');
+        $('#form-fields').innerHTML = '<div class="form-field full read-view"><div class="read-meta">' + meta + '</div>'
+          + readBlock(L.notes, readText(idea.notes, L))
+          + readBlock(L.check, readChecklist(idea.checklist, L))
+          + readBlock(L.files, readAttachments(idea.attachments, L))
+          + readBlock(L.log, readLog(idea.log, L))
+          + '</div>';
+        setReadFooter('edit-idea', id, L);
+        wrapTextareas(); $('#modal-backdrop').classList.add('open');
+        hydrateSoon();
+      }
+      function openTaskView(id) {
+        const task = state.tasks.find(t => t.id === id); if (!task) { openTaskCard(id); return; }
+        normalizeTaskInPlace(task);
+        const L = readLabels();
+        currentModal = 'task-view'; editingTaskId = id; editingIdeaId = null; editingEventId = null;
+        const prio = { high: lang === 'de' ? 'Hoch' : 'Высокий', medium: lang === 'de' ? 'Mittel' : 'Средний', low: lang === 'de' ? 'Niedrig' : 'Низкий' }[task.priority] || task.priority;
+        $('#modal-title').textContent = task.title;
+        $('#modal-subtitle').textContent = taskStatusLabel(task.status) + ' · ' + (task.due ? formatDate(task.due, { day:'numeric', month:'long', year:'numeric' }) : L.noDue);
+        const meta = [taskStatusLabel(task.status), L.priority + ': ' + prio, task.owner ? L.owner + ': ' + task.owner : '', task.area ? L.area + ': ' + task.area : '', L.due + ': ' + (task.due ? formatDate(task.due, { day:'numeric', month:'long', year:'numeric' }) : L.noDue)]
+          .filter(Boolean).map(x => '<span>' + escapeHtml(x) + '</span>').join('');
+        $('#form-fields').innerHTML = '<div class="form-field full read-view"><div class="read-meta">' + meta + '</div>'
+          + readBlock(L.notes, readText(task.notes, L))
+          + readBlock(L.check, readChecklist(task.checklist, L))
+          + readBlock(L.files, readAttachments(task.attachments, L))
+          + readBlock(L.log, readLog(task.log, L))
+          + '</div>';
+        setReadFooter('edit-task', id, L);
+        wrapTextareas(); $('#modal-backdrop').classList.add('open');
+        hydrateSoon();
+      }
       function ideaFormHtml(idea) {
         const L = lang === 'de'
           ? { title:'Titel', notes:'Notizen', status:'Status', channel:'Kanal', tags:'Tags', folder:'Ordner', none:'Ohne Ordner', event:'Verknüpftes Ereignis', nolink:'Ohne Verknüpfung', tagsPh:'Tags durch Komma getrennt', log:'Verlauf', empty:'Leer', newFolder:'Neuen Ordner anlegen', renameFolder:'Ordner umbenennen', newChannel:'Neuen Kanal anlegen', removeChannel:'Kanal entfernen', check:'Checkliste', addCheck:'Schritt hinzufügen', files:'Dateien und Links', addFile:'📎 Datei', addLink:'🔗 Link', folderOnDisk:'Ordner auf der Festplatte' }
@@ -1559,7 +1762,7 @@
         $('#modal-subtitle').textContent = lang === 'de' ? 'Kalenderverknüpfung nur manuell.' : 'Связь с календарём — только вручную.';
         $('#form-fields').innerHTML = ideaFormHtml(idea);
         $('#entry-form').querySelector('.modal-footer').innerHTML = '<button type="button" class="ghost-btn" data-action="close-modal">' + (lang === 'de' ? 'Abbrechen' : 'Отмена') + '</button><button type="submit" class="primary-btn">' + (lang === 'de' ? 'Speichern' : 'Сохранить') + '</button>';
-        $('#modal-backdrop').classList.add('open');
+        wrapTextareas(); $('#modal-backdrop').classList.add('open');
       }
       function readIdeaFromForm(form) {
         const d = Object.fromEntries(new FormData(form).entries());
@@ -1583,9 +1786,11 @@
         }
         const saved = state.ideas[state.ideas.length - 1];
         const target = currentModal === 'idea-edit' ? state.ideas.find(i => i.id === editingIdeaId) : saved;
+        const viewId = target ? target.id : null;
         editingIdeaId = null; closeModal(); persist();
         if (diskHandle && target) writeIdeaToDisk(target).catch(() => {});
         showToast(lang === 'de' ? 'Idee gespeichert' : 'Идея сохранена');
+        if (viewId) openIdeaView(viewId);
       }
       function deleteIdea(id) {
         if (!confirm(lang === 'de' ? 'Idee löschen?' : 'Удалить идею?')) return;
@@ -1800,10 +2005,12 @@
           meeting: '<div class="form-field full"><label for="entry-title">Название</label><input id="entry-title" name="title" required placeholder="Например: еженедельный контент-синк"></div><div class="form-field"><label for="entry-date">Дата</label><input id="entry-date" name="date" type="date" required></div><div class="form-field"><label for="entry-time">Время</label><input id="entry-time" name="time" type="time"></div><div class="form-field full"><label for="entry-participants">Участники</label><input id="entry-participants" name="participants" placeholder="Имена или роли через запятую"></div><div class="form-field full"><label for="entry-agenda">Повестка</label><textarea id="entry-agenda" name="agenda" placeholder="Что нужно обсудить"></textarea></div><div class="form-field full"><label for="entry-outcome">Ожидаемый результат</label><textarea id="entry-outcome" name="outcome" placeholder="Какое решение или следующий шаг должен появиться"></textarea></div>',
           event: '<div class="form-field full"><label for="entry-title">Название</label><input id="entry-title" name="title" required placeholder="Например: редакционный синк"></div><div class="form-field"><label for="entry-start">Дата начала</label><input id="entry-start" name="start" type="date" required></div><div class="form-field"><label for="entry-end">Дата окончания</label><input id="entry-end" name="end" type="date"></div><div class="form-field"><label for="entry-event-type">Тип</label><select id="entry-event-type" name="eventType"><option value="event">Событие</option><option value="meeting">Встреча</option><option value="task">Задача</option><option value="holiday">Праздник</option><option value="absence">Отсутствие</option><option value="reminder">Напоминание</option></select></div><div class="form-field"><label for="entry-category">Категория</label><select id="entry-category" name="category"><option value="work">Работа</option><option value="social">Социальные медиа</option><option value="regional">Региональные даты</option><option value="personal">Личное</option></select></div><div class="form-field"><label for="entry-location">Место</label><input id="entry-location" name="location" placeholder="Место или ссылка"></div><div class="form-field"><label for="entry-all-day"><input id="entry-all-day" name="allDay" type="checkbox" value="true"> Весь день</label></div><div class="form-field full"><label for="entry-description">Описание</label><textarea id="entry-description" name="description" placeholder="Контекст, повестка или заметка"></textarea></div>' + recurrenceFieldHtml()
         };
-        $('#entry-form').querySelector('.modal-footer').innerHTML = '<button type="button" class="ghost-btn" data-action="close-modal">' + (lang === 'de' ? 'Abbrechen' : 'Отмена') + '</button><button type="submit" class="primary-btn">' + (lang === 'de' ? 'Speichern' : 'Сохранить') + '</button>'; editingTaskId = null; editingEventId = null; $('#form-fields').innerHTML = fields[type]; $('#entry-form').reset(); if ($('#entry-date')) $('#entry-date').value = isoDate(today); if ($('#entry-start')) $('#entry-start').value = isoDate(today); if ($('#entry-end')) $('#entry-end').value = isoDate(today); localizeDOM(); updateRecurrencePreview(); $('#modal-backdrop').classList.add('open'); setTimeout(() => $('#entry-title')?.focus(), 0);
+        $('#entry-form').querySelector('.modal-footer').innerHTML = '<button type="button" class="ghost-btn" data-action="close-modal">' + (lang === 'de' ? 'Abbrechen' : 'Отмена') + '</button><button type="submit" class="primary-btn">' + (lang === 'de' ? 'Speichern' : 'Сохранить') + '</button>'; editingTaskId = null; editingEventId = null; $('#form-fields').innerHTML = fields[type]; $('#entry-form').reset(); if ($('#entry-date')) $('#entry-date').value = isoDate(today); if ($('#entry-start')) $('#entry-start').value = isoDate(today); if ($('#entry-end')) $('#entry-end').value = isoDate(today); localizeDOM(); updateRecurrencePreview(); wrapTextareas(); $('#modal-backdrop').classList.add('open'); setTimeout(() => $('#entry-title')?.focus(), 0);
       }
-      function closeModal() { $('#modal-backdrop').classList.remove('open'); currentModal = null; }
-      function handleSubmit(event) { event.preventDefault(); if (currentModal === 'task-card') { saveTaskCard(event.target); return; } if (currentModal === 'idea' || currentModal === 'idea-edit') { saveIdea(event.target); return; } const data = Object.fromEntries(new FormData(event.target).entries()); if (currentModal === 'task') { const nt = normalizeTask({ id:uid('task'), ...data, status:data.status || 'todo', priority:data.priority || 'medium' }); logTask(nt, lang === 'de' ? 'Aufgabe angelegt' : 'Задача создана'); state.tasks.push(nt); } if (currentModal === 'content') state.content.push({ id:uid('content'), ...data }); if (currentModal === 'meeting') state.meetings.push({ id:uid('meeting'), ...data, status:'Запланирована' }); if (currentModal === 'event-edit') {
+      function closeModal() {
+        const m0 = $('#modal-backdrop') && $('#modal-backdrop').querySelector('.modal');
+        if (m0 && m0.classList) m0.classList.remove('text-full'); $('#modal-backdrop').classList.remove('open'); currentModal = null; }
+      function handleSubmit(event) { event.preventDefault(); if (currentModal === 'task-card') { saveTaskCard(event.target); return; } if (currentModal === 'idea' || currentModal === 'idea-edit') { saveIdea(event.target); return; } const data = Object.fromEntries(new FormData(event.target).entries()); let __newTaskId = null; if (currentModal === 'task') { const nt = normalizeTask({ id:uid('task'), ...data, status:data.status || 'todo', priority:data.priority || 'medium' }); logTask(nt, lang === 'de' ? 'Aufgabe angelegt' : 'Задача создана'); state.tasks.push(nt); __newTaskId = nt.id; } if (currentModal === 'content') state.content.push({ id:uid('content'), ...data }); if (currentModal === 'meeting') state.meetings.push({ id:uid('meeting'), ...data, status:'Запланирована' }); if (currentModal === 'event-edit') {
           const idx = state.events.findIndex(x => x.id === editingEventId);
           if (idx !== -1) {
             const prev = state.events[idx];
@@ -1811,7 +2018,7 @@
           }
           if (data.start) eventCursor = parseDate(data.start);
           editingEventId = null; closeModal(); persist(); showToast(lang === 'de' ? 'Ereignis aktualisiert' : 'Событие обновлено'); return;
-        } if (currentModal === 'event') state.events.push(normalizeEvent({ recurrence: readRecurrenceFromForm(event.target), id:uid('event'), title:data.title, start:data.start, end:data.end || data.start, type:data.eventType || 'event', category:data.category || 'work', location:data.location || '', description:data.description || '', allDay:data.allDay === 'true', source:'manual', externalId:'', importedAt:new Date().toISOString() })); if (data.start) eventCursor = parseDate(data.start); closeModal(); persist(); showToast(lang === 'de' ? 'Lokal gespeichert' : 'Запись сохранена локально'); }
+        } if (currentModal === 'event') state.events.push(normalizeEvent({ recurrence: readRecurrenceFromForm(event.target), id:uid('event'), title:data.title, start:data.start, end:data.end || data.start, type:data.eventType || 'event', category:data.category || 'work', location:data.location || '', description:data.description || '', allDay:data.allDay === 'true', source:'manual', externalId:'', importedAt:new Date().toISOString() })); if (data.start) eventCursor = parseDate(data.start); closeModal(); persist(); showToast(lang === 'de' ? 'Lokal gespeichert' : 'Запись сохранена локально'); if (__newTaskId) openTaskView(__newTaskId); }
       function toggleTask(id) { const task = state.tasks.find(t => t.id === id); if (!task) return; normalizeTaskInPlace(task); const prev = task.status; task.status = task.status === 'done' ? 'todo' : 'done'; logTask(task, (lang === 'de' ? 'Status: ' : 'Статус: ') + taskStatusLabel(prev) + ' → ' + taskStatusLabel(task.status)); persist(); showToast(task.status === 'done' ? 'Задача отмечена как готовая' : 'Задача возвращена в работу'); }
       function deleteItem(type, id) { if (!confirm(lang === 'de' ? 'Diesen Eintrag löschen?' : 'Удалить эту запись?')) return; state[type] = state[type].filter(item => item.id !== id); persist(); showToast(lang === 'de' ? 'Gelöscht' : 'Запись удалена'); }
       function createTaskFromEvent(id) { const e = state.events.find(x => x.id === id); if (!e) return; const nt = normalizeTask({ id:uid('task'), title:e.title, owner:'', area:e.category || 'Календарь', due:e.start, priority:'medium', status:'todo', notes:e.description || '', eventId:e.id }); logTask(nt, lang === 'de' ? 'Aus Kalenderereignis erstellt' : 'Создано из события календаря'); state.tasks.push(nt); persist(); navTo('tasks'); showToast(lang === 'de' ? 'Aufgabe erstellt' : 'Задача создана из события'); }
@@ -2068,7 +2275,7 @@
           + (task.log.length ? task.log.map(l => '<div class="card-line"><span><em>' + new Date(l.at).toLocaleString(lang === 'de' ? 'de-DE' : 'ru-RU') + '</em> — ' + escapeHtml(l.text) + '</span></div>').join('') : '<div class="card-empty">' + t.empty + '</div>')
           + '</div></div>';
         $('#entry-form').querySelector('.modal-footer').innerHTML = '<button type="button" class="ghost-btn" data-action="close-modal">' + t.close + '</button><button type="submit" class="primary-btn">' + t.save + '</button>';
-        $('#modal-backdrop').classList.add('open');
+        wrapTextareas(); $('#modal-backdrop').classList.add('open');
       }
       function normalizeTaskInPlace(t) {
         t.log = Array.isArray(t.log) ? t.log : [];
@@ -2086,8 +2293,10 @@
         task.due = data.due; task.priority = data.priority; task.status = data.status; task.notes = data.notes;
         if (before !== task.status) logTask(task, (lang === 'de' ? 'Status: ' : 'Статус: ') + taskStatusLabel(before) + ' → ' + taskStatusLabel(task.status));
         else logTask(task, lang === 'de' ? 'Karte aktualisiert' : 'Карточка обновлена');
+        const backTo = task.id;
         closeModal(); persist();
         showToast(lang === 'de' ? 'Aufgabe gespeichert' : 'Задача сохранена');
+        openTaskView(backTo);
       }
       function addChecklistItem() {
         const task = currentTask(); const input = $('#check-input'); if (!task || !input || !input.value.trim()) return;
@@ -2138,6 +2347,9 @@
         if (action === 'add-content') openModal('content');
         if (action === 'add-meeting') openModal('meeting');
         if (action === 'add-event') openModal('event');
+        if (action === 'edit-idea') { const b = event.target.closest('[data-edit-id]'); if (b) openIdeaModal(b.dataset.editId); return; }
+        if (action === 'edit-task') { const b = event.target.closest('[data-edit-id]'); if (b) openTaskCard(b.dataset.editId); return; }
+        if (action === 'expand-text') { toggleTextFull(); return; }
         if (action === 'add-idea') openIdeaModal(null);
         if (action === 'add-folder') addFolder();
         if (action === 'add-folder-inline') addFolderInline();
@@ -2156,6 +2368,7 @@
         if (action === 'add-check') addChecklistItem();
         if (action === 'gh-save') { saveGhConfig($('#gh-owner').value, $('#gh-repo').value, $('#gh-branch').value, $('#gh-token').value); $('#gh-token').value = ''; setSyncStatus(lang === 'de' ? 'Zugang gespeichert' : 'Доступ сохранён'); ghCheck(); }
         if (action === 'gh-check') ghCheck();
+        if (action === 'gh-test') ghTestPush();
         if (action === 'gh-push') ghPush();
         if (action === 'gh-pull') ghPull();
         if (action === 'gh-forget') forgetGh();
@@ -2175,7 +2388,7 @@
         if (action === 'reset-event-filters') { ['event-search','event-type-filter','event-source-filter','event-category-filter'].forEach(id => { const el = $('#' + id); if (el) el.value = id === 'event-search' ? '' : 'all'; }); renderEventCalendar(); renderEventList(); }
         if (action === 'confirm-calendar-import') confirmCalendarImport();
         if (action === 'cancel-calendar-import') { importBuffer=[]; $('#calendar-import-preview').classList.remove('open'); }
-        const openT = event.target.closest('[data-task-open]'); if (openT) { openTaskCard(openT.dataset.taskOpen); return; }
+        const openT = event.target.closest('[data-task-open]'); if (openT) { openTaskView(openT.dataset.taskOpen); return; }
         const chk = event.target.closest('[data-check-toggle]');
         if (chk) { const task = currentTask(); if (task) { const item = task.checklist.find(c => c.id === chk.dataset.checkToggle); if (item) { item.done = !item.done; logTask(task, (item.done ? (lang === 'de' ? 'Erledigt: ' : 'Выполнено: ') : (lang === 'de' ? 'Offen: ' : 'Снята отметка: ')) + item.text); persistQuiet(); openTaskCard(task.id); } } return; }
         const chkDel = event.target.closest('[data-check-remove]');
@@ -2205,7 +2418,7 @@
         const ideaDel = event.target.closest('[data-idea-delete]'); if (ideaDel) { deleteIdea(ideaDel.dataset.ideaDelete); return; }
         const ideaEv = event.target.closest('[data-idea-event]'); if (ideaEv) { createEventFromIdea(ideaEv.dataset.ideaEvent); return; }
         const ideaTk = event.target.closest('[data-idea-task]'); if (ideaTk) { createTaskFromIdea(ideaTk.dataset.ideaTask); return; }
-        const ideaOpen = event.target.closest('[data-idea-open]'); if (ideaOpen) { openIdeaModal(ideaOpen.dataset.ideaOpen); return; }
+        const ideaOpen = event.target.closest('[data-idea-open]'); if (ideaOpen) { openIdeaView(ideaOpen.dataset.ideaOpen); return; }
         const eventDetail = event.target.closest('[data-event-detail]'); if (eventDetail) showEventDetail(eventDetail.dataset.eventDetail);
       });
       $('#entry-form').addEventListener('submit', handleSubmit);
@@ -2223,10 +2436,17 @@
       document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); openModal('task'); } });
       (function initSync() {
         const c = ghConfig();
+        if ($('#gh-mode')) { $('#gh-mode').value = syncMode(); $('#gh-mode').addEventListener('change', (e) => setSyncMode(e.target.value)); }
+        if (typeof window !== 'undefined' && window.addEventListener) {
+          window.addEventListener('online', () => { renderSyncBadge(); scheduleAutoSync(); });
+          window.addEventListener('offline', renderSyncBadge);
+        }
+        setTimeout(dailySyncCheck, 1200);
         if ($('#gh-owner')) $('#gh-owner').value = c.owner || '';
         if ($('#gh-repo')) $('#gh-repo').value = c.repo || '';
         if ($('#gh-branch')) $('#gh-branch').value = c.branch || 'main';
         renderSyncPanel();
+        renderSyncBadge();
         setSyncStatus(ghReady() ? (lang === 'de' ? 'Bereit' : 'Готово к синхронизации') : (lang === 'de' ? 'Kein Zugang hinterlegt' : 'Доступ не настроен'));
       })();
       applyLanguage();
