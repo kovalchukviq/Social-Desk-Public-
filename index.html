@@ -2301,8 +2301,8 @@
         openModal('event');
         modalStack = __keep;
         editingEventId = e.id; currentModal = 'event-edit';
-        $('#modal-title').textContent = (lang === 'de' ? 'Ereignis bearbeiten' : 'Редактирование события');
-        $('#modal-subtitle').textContent = eventTypeLabel(e.type) + ' · ' + sourceLabel(e.source);
+        $('#modal-title').textContent = e.title || (lang === 'de' ? 'Ereignis bearbeiten' : 'Редактирование события');
+        $('#modal-subtitle').textContent = (lang === 'de' ? 'Ereignis bearbeiten' : 'Редактирование события') + ' · ' + eventTypeLabel(e.type);
         const set = (sel, val) => { const el = $(sel); if (el) el.value = val || ''; };
         set('#entry-title', e.title); set('#entry-start', e.start); set('#entry-end', e.end || e.start);
         set('#entry-start-time', e.startTime); set('#entry-end-time', e.endTime);
@@ -2314,14 +2314,6 @@
         $$('input[name="recDay"]').forEach(i => { i.checked = (rec.byday || []).indexOf(i.value) !== -1; });
         renderModalBack();
         updateRecurrencePreview();
-        (function () {
-          const L = readLabels();
-          const tks = tasksOfEvent(e.id), ids = ideasOfEvent(e.id);
-          let extra = '';
-          if (tks.length) extra += readBlock(L.linkedTasks, tks.map(taskLinkHtml).join(''));
-          if (ids.length) extra += readBlock(L.linkedIdeas, ids.map(ideaLinkHtml).join(''));
-          if (extra) $('#form-fields').innerHTML += '<div class="form-field full read-view">' + extra + '</div>';
-        })();
         $('#entry-form').querySelector('.modal-footer').innerHTML =
           '<button type="button" class="ghost-btn" data-event-delete="' + e.id + '">' + (lang === 'de' ? '✗ Löschen' : '✗ Удалить') + '</button>' +
           '<button type="button" class="ghost-btn" data-event-task="' + e.id + '">' + (lang === 'de' ? '＋ Aufgabe' : '＋ Задача') + '</button>' +
