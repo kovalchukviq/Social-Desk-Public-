@@ -604,7 +604,7 @@
 
       <section class="view" id="view-data">
         <div class="view-header"><div><div class="eyebrow">Локальное хранение</div><h2 class="page-title">Данные</h2><p>Переносите рабочее пространство между компьютерами через один JSON-файл.</p></div></div>
-        <div class="data-layout"><section class="data-card"><h3>Ручная синхронизация</h3><p>Приложение не подключается к API и не отправляет данные в интернет. Экспортируйте файл в общую папку OneDrive и импортируйте актуальную версию перед началом работы.</p><div class="data-actions"><button class="primary-btn" data-action="export">↥ Экспортировать JSON</button><button class="ghost-btn" data-action="import">↧ Импортировать JSON</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить календарь</button><button class="ghost-btn" data-action="reset-workspace">↺ Сбросить всё</button></div><div class="notice">Совет: перед импортом сохраните собственный экспорт. При одновременной работе сотрудников используйте договорённость «один редактор — одна версия файла».</div></section><section class="data-card"><h3 data-i18n="sync.title">Синхронизация с GitHub</h3><p data-i18n="sync.sub">Приватный репозиторий хранит state.json и вложения. Токен остаётся на этом устройстве.</p><div class="form-grid"><label class="form-field"><span data-i18n="sync.owner">Владелец</span><input class="field" id="gh-owner" placeholder="username"></label><label class="form-field"><span data-i18n="sync.repo">Репозиторий</span><input class="field" id="gh-repo" placeholder="social-desk-data"></label><label class="form-field"><span data-i18n="sync.branch">Ветка</span><input class="field" id="gh-branch" placeholder="main"></label><label class="form-field"><span data-i18n="sync.token">Токен доступа</span><input class="field" id="gh-token" type="password" autocomplete="off" placeholder="ghp_…"></label></div><div class="data-actions"><button class="ghost-btn" data-action="gh-save" data-i18n="sync.save">Сохранить доступ</button><button class="primary-btn" data-action="gh-push" data-i18n="sync.push">↥ Выгрузить в GitHub</button><button class="ghost-btn" data-action="gh-pull" data-i18n="sync.pull">↧ Загрузить из GitHub</button><button class="ghost-btn" data-action="gh-forget" data-i18n="sync.forget">✗ Забыть токен</button><button class="ghost-btn" data-action="export-bundle" data-i18n="sync.zip">↥ Резервная копия ZIP</button></div><div class="notice"><span id="gh-repo-label"></span> · <span id="gh-status"></span></div></section><section class="data-card"><h3 data-i18n="storage.health">Надёжность хранения</h3><p id="storage-health-note" data-i18n="storage.note">Проверка…</p><div class="data-actions"><span class="storage-flag warn" id="storage-flag">…</span><button class="ghost-btn" data-action="request-persist" data-i18n="storage.request">Закрепить хранилище</button><button class="ghost-btn" data-action="restore-snapshot" data-i18n="storage.restore">Восстановить из снимка</button></div></section><section class="data-card"><h3>Текущее содержимое</h3><p>Предпросмотр локального набора данных.</p><pre class="data-preview" id="data-preview"></pre></section></div>
+        <div class="data-layout"><section class="data-card"><h3>Ручная синхронизация</h3><p>Приложение не подключается к API и не отправляет данные в интернет. Экспортируйте файл в общую папку OneDrive и импортируйте актуальную версию перед началом работы.</p><div class="data-actions"><button class="primary-btn" data-action="export">↥ Экспортировать JSON</button><button class="ghost-btn" data-action="import">↧ Импортировать JSON</button><button class="ghost-btn" data-action="clear-calendar">✗ Очистить календарь</button><button class="ghost-btn" data-action="reset-workspace">↺ Сбросить всё</button></div><div class="notice">Совет: перед импортом сохраните собственный экспорт. При одновременной работе сотрудников используйте договорённость «один редактор — одна версия файла».</div></section><section class="data-card"><h3 data-i18n="sync.title">Синхронизация с GitHub</h3><p data-i18n="sync.sub">Приватный репозиторий хранит state.json и вложения. Токен остаётся на этом устройстве.</p><div class="form-grid"><label class="form-field"><span data-i18n="sync.owner">Владелец</span><input class="field" id="gh-owner" placeholder="username"></label><label class="form-field"><span data-i18n="sync.repo">Репозиторий</span><input class="field" id="gh-repo" placeholder="social-desk-data"></label><label class="form-field"><span data-i18n="sync.branch">Ветка</span><input class="field" id="gh-branch" placeholder="main"></label><label class="form-field"><span data-i18n="sync.token">Токен доступа</span><input class="field" id="gh-token" type="password" autocomplete="off" placeholder="github_pat_…"></label></div><div class="data-actions"><button class="ghost-btn" data-action="gh-save" data-i18n="sync.save">Сохранить доступ</button><button class="ghost-btn" data-action="gh-check" data-i18n="sync.check">✓ Проверить токен</button><button class="primary-btn" data-action="gh-push" data-i18n="sync.push">↥ Выгрузить в GitHub</button><button class="ghost-btn" data-action="gh-pull" data-i18n="sync.pull">↧ Загрузить из GitHub</button><button class="ghost-btn" data-action="gh-forget" data-i18n="sync.forget">✗ Забыть токен</button><button class="ghost-btn" data-action="export-bundle" data-i18n="sync.zip">↥ Резервная копия ZIP</button></div><div class="notice"><span id="gh-repo-label"></span> · <span id="gh-token-hint"></span></div><div class="notice" id="gh-status" role="status"></div></section><section class="data-card"><h3 data-i18n="storage.health">Надёжность хранения</h3><p id="storage-health-note" data-i18n="storage.note">Проверка…</p><div class="data-actions"><span class="storage-flag warn" id="storage-flag">…</span><button class="ghost-btn" data-action="request-persist" data-i18n="storage.request">Закрепить хранилище</button><button class="ghost-btn" data-action="restore-snapshot" data-i18n="storage.restore">Восстановить из снимка</button></div></section><section class="data-card"><h3>Текущее содержимое</h3><p>Предпросмотр локального набора данных.</p><pre class="data-preview" id="data-preview"></pre></section></div>
       </section>
     </main>
   </div>
@@ -868,7 +868,7 @@
       async function ghGet(path) {
         const res = await fetch(ghBase() + path + '?ref=' + encodeURIComponent(ghBranch()), { headers: ghHeaders() });
         if (res.status === 404) return null;
-        if (!res.ok) throw new Error('GitHub ' + res.status);
+        if (!res.ok) throw new Error(ghErrorText(res.status));
         return res.json();
       }
       async function ghPut(path, u8, message) {
@@ -877,8 +877,16 @@
         const body = { message: message || 'social-desk sync', content: b64FromU8(u8), branch: ghBranch() };
         if (sha) body.sha = sha;
         const res = await fetch(ghBase() + path, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, ghHeaders()), body: JSON.stringify(body) });
-        if (!res.ok) throw new Error('GitHub ' + res.status);
+        if (!res.ok) throw new Error(ghErrorText(res.status));
         return res.json();
+      }
+      function ghErrorText(status) {
+        if (status === 401) return lang === 'de' ? '401 — Token ungültig. „Token prüfen“ drücken.' : '401 — токен недействителен. Нажмите «Проверить токен».';
+        if (status === 403) return lang === 'de' ? '403 — keine Berechtigung (Contents: Read and write) oder Rate Limit.' : '403 — нет прав (Contents: Read and write) или превышен лимит запросов.';
+        if (status === 404) return lang === 'de' ? '404 — Repository oder Branch nicht gefunden.' : '404 — репозиторий или ветка не найдены.';
+        if (status === 409) return lang === 'de' ? '409 — Konflikt, bitte zuerst laden.' : '409 — конфликт, сначала загрузите копию.';
+        if (status === 422) return lang === 'de' ? '422 — Datei zu groß oder ungültiger Pfad.' : '422 — файл слишком большой или неверный путь.';
+        return 'GitHub ' + status;
       }
       async function ghPush() {
         if (!ghReady()) { showToast(lang === 'de' ? 'Bitte zuerst Repository und Token speichern' : 'Сначала сохраните репозиторий и токен'); navTo('data'); return; }
@@ -936,15 +944,72 @@
       function setSyncStatus(text) { const el = $('#gh-status'); if (el) el.textContent = text; }
       function renderSyncPanel() {
         const c = ghConfig();
+        const hint = $('#gh-token-hint');
+        if (hint) hint.textContent = tokenHint();
         const el = $('#gh-repo-label');
         if (el) el.textContent = ghReady() ? c.owner + '/' + c.repo + ' · ' + ghBranch() : (lang === 'de' ? 'Nicht verbunden' : 'Не подключено');
       }
+      function cleanToken(t) { return String(t || '').replace(/\s+/g, ''); }
+      function cleanOwner(t) {
+        return String(t || '').trim().replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\/.*$/, '').replace(/^@/, '');
+      }
+      function cleanRepo(t) {
+        return String(t || '').trim().replace(/^https?:\/\/(www\.)?github\.com\//i, '').replace(/\.git$/i, '').split('/').filter(Boolean).pop() || '';
+      }
       function saveGhConfig(owner, repo, branch, token) {
         try {
-          localStorage.setItem(GH_CFG_KEY, JSON.stringify({ owner: owner.trim(), repo: repo.trim(), branch: (branch || 'main').trim() }));
-          if (token) localStorage.setItem(GH_TOKEN_KEY, token.trim());
+          localStorage.setItem(GH_CFG_KEY, JSON.stringify({ owner: cleanOwner(owner), repo: cleanRepo(repo), branch: String(branch || 'main').trim() || 'main' }));
+          const tk = cleanToken(token);
+          if (tk) localStorage.setItem(GH_TOKEN_KEY, tk);
         } catch (e) {}
         renderSyncPanel();
+      }
+      function tokenHint() {
+        const tk = ghToken();
+        if (!tk) return lang === 'de' ? 'Kein Token gespeichert' : 'Токен не сохранён';
+        const shape = /^github_pat_/.test(tk) ? 'fine-grained' : (/^ghp_/.test(tk) ? 'classic' : (lang === 'de' ? 'unbekanntes Format' : 'неизвестный формат'));
+        return (lang === 'de' ? 'Token: ' : 'Токен: ') + shape + ', ' + tk.length + ' ' + (lang === 'de' ? 'Zeichen' : 'символов') + ', …' + tk.slice(-4);
+      }
+      async function ghCheck() {
+        const lines = [];
+        const c = ghConfig();
+        const tk = ghToken();
+        lines.push(tokenHint());
+        if (!tk) { setSyncStatus(lines.join(' · ')); return; }
+        if (!/^(github_pat_|ghp_|gho_|ghs_)/.test(tk)) lines.push(lang === 'de' ? '⚠ Präfix untypisch — evtl. Tokenname statt Token eingefügt' : '⚠ Необычный префикс — возможно, вставлено имя токена, а не токен');
+        setSyncStatus((lang === 'de' ? 'Prüfe…' : 'Проверка…'));
+        try {
+          const u = await fetch('https://api.github.com/user', { headers: ghHeaders() });
+          if (u.status === 401) {
+            lines.push(lang === 'de' ? '✗ 401 Bad credentials — Token ungültig, abgelaufen oder unvollständig kopiert' : '✗ 401 Bad credentials — токен недействителен, истёк или скопирован не целиком');
+            setSyncStatus(lines.join(' · ')); return;
+          }
+          if (!u.ok) { lines.push('✗ /user → HTTP ' + u.status); setSyncStatus(lines.join(' · ')); return; }
+          const me = await u.json();
+          lines.push((lang === 'de' ? '✓ Token gültig, Konto: ' : '✓ Токен действителен, аккаунт: ') + me.login);
+          if (c.owner && me.login && c.owner.toLowerCase() !== me.login.toLowerCase()) {
+            lines.push((lang === 'de' ? '⚠ Owner-Feld weicht ab: ' : '⚠ Поле «Владелец» отличается: ') + c.owner);
+          }
+          if (!c.owner || !c.repo) { lines.push(lang === 'de' ? '⚠ Owner/Repository fehlt' : '⚠ Не заполнены владелец/репозиторий'); setSyncStatus(lines.join(' · ')); return; }
+          const r = await fetch('https://api.github.com/repos/' + c.owner + '/' + c.repo, { headers: ghHeaders() });
+          if (r.status === 404) {
+            lines.push(lang === 'de' ? '✗ 404 — Repository nicht gefunden oder Token hat keinen Zugriff darauf' : '✗ 404 — репозиторий не найден или у токена нет доступа к нему');
+            setSyncStatus(lines.join(' · ')); return;
+          }
+          if (!r.ok) { lines.push('✗ /repos → HTTP ' + r.status); setSyncStatus(lines.join(' · ')); return; }
+          const repoInfo = await r.json();
+          lines.push((lang === 'de' ? '✓ Repository: ' : '✓ Репозиторий: ') + repoInfo.full_name + (repoInfo.private ? ' (private)' : ' (public)'));
+          const branch = ghBranch();
+          if (repoInfo.default_branch && repoInfo.default_branch !== branch) {
+            lines.push((lang === 'de' ? '⚠ Default branch ist ' : '⚠ Ветка по умолчанию — ') + repoInfo.default_branch + (lang === 'de' ? ', eingetragen: ' : ', указана: ') + branch);
+          }
+          const perm = repoInfo.permissions || {};
+          if (perm.push === false) lines.push(lang === 'de' ? '✗ Kein Schreibrecht — Contents: Read and write fehlt' : '✗ Нет права записи — не выдано Contents: Read and write');
+          else lines.push(lang === 'de' ? '✓ Schreibrecht vorhanden' : '✓ Право записи есть');
+        } catch (err) {
+          lines.push((lang === 'de' ? '✗ Netzwerkfehler: ' : '✗ Ошибка сети: ') + err.message);
+        }
+        setSyncStatus(lines.join(' · '));
       }
       function forgetGh() {
         try { localStorage.removeItem(GH_TOKEN_KEY); localStorage.removeItem(GH_CFG_KEY); } catch (e) {}
@@ -1061,11 +1126,11 @@
       const translations = {
         ru: {
           'app.eyebrow':'Социальные медиа · control room', 'nav.overview':'Обзор', 'nav.tasks':'Задачи', 'nav.content':'Контент', 'nav.meetings':'Встречи', 'nav.calendar':'Календарь', 'nav.ideas':'Идеи', 'ideas.eyebrow':'Банк идей', 'ideas.title':'Идеи контента', 'ideas.intro':'Складывайте идеи в папки. Связь с календарём — только вручную.', 'ideas.add':'＋ Новая идея', 'ideas.folders':'Папки', 'ideas.foldersSub':'Один уровень. Удаление папки не удаляет идеи.', 'ideas.list':'Идеи', 'ideas.channels':'Каналы', 'ideas.channelsSub':'Список редактируемый: добавляйте, переименовывайте и удаляйте каналы.', 'ideas.disk':'Папка на диске', 'ideas.diskSub':'Подключите папку один раз — приложение создаст подпапку для каждой идеи с заметками и вложениями.', 'nav.data':'Данные', 'actions.add':'＋ Добавить', 'actions.reset':'Сбросить',
-          'calendar.eyebrow':'Локальный календарь', 'calendar.title':'Календарь', 'calendar.intro':'Импортируйте Outlook, праздники и задачи пакетно — без API и без отправки данных наружу.', 'calendar.addEvent':'＋ Новое событие', 'calendar.importIcs':'↧ Импорт ICS', 'calendar.importCsv':'↧ Импорт CSV', 'calendar.exportIcs':'↥ Экспорт ICS', 'calendar.monthView':'Календарь событий', 'calendar.eventList':'Список событий', 'calendar.eventListSub':'Откройте событие, чтобы создать задачу или запланировать дальнейшее действие.', 'calendar.modeGroup':'Режим календаря', 'calendar.prev':'Назад', 'calendar.next':'Вперёд', 'calendar.today':'Сегодня', 'calendar.modeDay':'День', 'calendar.modeWeek':'Неделя', 'calendar.modeMonth':'Месяц', 'backup.now':'Экспортировать', 'backup.later':'Позже', 'storage.health':'Надёжность хранения', 'storage.note':'Проверка…', 'storage.request':'Закрепить хранилище', 'storage.restore':'Восстановить из снимка', 'sync.title':'Синхронизация с GitHub', 'sync.sub':'Приватный репозиторий хранит state.json и вложения. Токен остаётся на этом устройстве.', 'sync.owner':'Владелец', 'sync.repo':'Репозиторий', 'sync.branch':'Ветка', 'sync.token':'Токен доступа', 'sync.save':'Сохранить доступ', 'sync.push':'↥ Выгрузить в GitHub', 'sync.pull':'↧ Загрузить из GitHub', 'sync.forget':'✗ Забыть токен', 'sync.zip':'↥ Резервная копия ZIP'
+          'calendar.eyebrow':'Локальный календарь', 'calendar.title':'Календарь', 'calendar.intro':'Импортируйте Outlook, праздники и задачи пакетно — без API и без отправки данных наружу.', 'calendar.addEvent':'＋ Новое событие', 'calendar.importIcs':'↧ Импорт ICS', 'calendar.importCsv':'↧ Импорт CSV', 'calendar.exportIcs':'↥ Экспорт ICS', 'calendar.monthView':'Календарь событий', 'calendar.eventList':'Список событий', 'calendar.eventListSub':'Откройте событие, чтобы создать задачу или запланировать дальнейшее действие.', 'calendar.modeGroup':'Режим календаря', 'calendar.prev':'Назад', 'calendar.next':'Вперёд', 'calendar.today':'Сегодня', 'calendar.modeDay':'День', 'calendar.modeWeek':'Неделя', 'calendar.modeMonth':'Месяц', 'backup.now':'Экспортировать', 'backup.later':'Позже', 'storage.health':'Надёжность хранения', 'storage.note':'Проверка…', 'storage.request':'Закрепить хранилище', 'storage.restore':'Восстановить из снимка', 'sync.check':'✓ Проверить токен', 'sync.title':'Синхронизация с GitHub', 'sync.sub':'Приватный репозиторий хранит state.json и вложения. Токен остаётся на этом устройстве.', 'sync.owner':'Владелец', 'sync.repo':'Репозиторий', 'sync.branch':'Ветка', 'sync.token':'Токен доступа', 'sync.save':'Сохранить доступ', 'sync.push':'↥ Выгрузить в GitHub', 'sync.pull':'↧ Загрузить из GitHub', 'sync.forget':'✗ Забыть токен', 'sync.zip':'↥ Резервная копия ZIP'
         },
         de: {
           'app.eyebrow':'Social Media · Control Room', 'nav.overview':'Übersicht', 'nav.tasks':'Aufgaben', 'nav.content':'Content', 'nav.meetings':'Meetings', 'nav.calendar':'Kalender', 'nav.ideas':'Ideen', 'ideas.eyebrow':'Ideenspeicher', 'ideas.title':'Content-Ideen', 'ideas.intro':'Ideen in Ordnern sammeln. Kalenderverknüpfung nur manuell.', 'ideas.add':'＋ Neue Idee', 'ideas.folders':'Ordner', 'ideas.foldersSub':'Eine Ebene. Das Löschen eines Ordners löscht keine Ideen.', 'ideas.list':'Ideen', 'ideas.channels':'Kanäle', 'ideas.channelsSub':'Die Liste ist bearbeitbar: Kanäle hinzufügen, umbenennen und entfernen.', 'ideas.disk':'Ordner auf der Festplatte', 'ideas.diskSub':'Ordner einmal verbinden — die Anwendung legt für jede Idee einen Unterordner mit Notizen und Anhängen an.', 'nav.data':'Daten', 'actions.add':'＋ Hinzufügen', 'actions.reset':'Zurücksetzen',
-          'calendar.eyebrow':'Lokaler Kalender', 'calendar.title':'Kalender', 'calendar.intro':'Outlook, Feiertage und Aufgaben gesammelt importieren — ohne API und ohne Datenübertragung.', 'calendar.addEvent':'＋ Neues Ereignis', 'calendar.importIcs':'↧ ICS importieren', 'calendar.importCsv':'↧ CSV importieren', 'calendar.exportIcs':'↥ ICS exportieren', 'calendar.monthView':'Ereigniskalender', 'calendar.eventList':'Ereignisliste', 'calendar.eventListSub':'Ereignis öffnen, Aufgabe erstellen oder nächste Aktion planen.', 'calendar.modeGroup':'Kalenderansicht', 'calendar.prev':'Zurück', 'calendar.next':'Weiter', 'calendar.today':'Heute', 'calendar.modeDay':'Tag', 'calendar.modeWeek':'Woche', 'calendar.modeMonth':'Monat', 'backup.now':'Exportieren', 'backup.later':'Später', 'storage.health':'Speichersicherheit', 'storage.note':'Prüfung…', 'storage.request':'Speicher dauerhaft machen', 'storage.restore':'Aus Snapshot wiederherstellen', 'sync.title':'Synchronisierung mit GitHub', 'sync.sub':'Ein privates Repository speichert state.json und Anhänge. Das Token bleibt auf diesem Gerät.', 'sync.owner':'Eigentümer', 'sync.repo':'Repository', 'sync.branch':'Branch', 'sync.token':'Zugriffstoken', 'sync.save':'Zugang speichern', 'sync.push':'↥ Zu GitHub hochladen', 'sync.pull':'↧ Von GitHub laden', 'sync.forget':'✗ Token löschen', 'sync.zip':'↥ Backup als ZIP'
+          'calendar.eyebrow':'Lokaler Kalender', 'calendar.title':'Kalender', 'calendar.intro':'Outlook, Feiertage und Aufgaben gesammelt importieren — ohne API und ohne Datenübertragung.', 'calendar.addEvent':'＋ Neues Ereignis', 'calendar.importIcs':'↧ ICS importieren', 'calendar.importCsv':'↧ CSV importieren', 'calendar.exportIcs':'↥ ICS exportieren', 'calendar.monthView':'Ereigniskalender', 'calendar.eventList':'Ereignisliste', 'calendar.eventListSub':'Ereignis öffnen, Aufgabe erstellen oder nächste Aktion planen.', 'calendar.modeGroup':'Kalenderansicht', 'calendar.prev':'Zurück', 'calendar.next':'Weiter', 'calendar.today':'Heute', 'calendar.modeDay':'Tag', 'calendar.modeWeek':'Woche', 'calendar.modeMonth':'Monat', 'backup.now':'Exportieren', 'backup.later':'Später', 'storage.health':'Speichersicherheit', 'storage.note':'Prüfung…', 'storage.request':'Speicher dauerhaft machen', 'storage.restore':'Aus Snapshot wiederherstellen', 'sync.check':'✓ Token prüfen', 'sync.title':'Synchronisierung mit GitHub', 'sync.sub':'Ein privates Repository speichert state.json und Anhänge. Das Token bleibt auf diesem Gerät.', 'sync.owner':'Eigentümer', 'sync.repo':'Repository', 'sync.branch':'Branch', 'sync.token':'Zugriffstoken', 'sync.save':'Zugang speichern', 'sync.push':'↥ Zu GitHub hochladen', 'sync.pull':'↧ Von GitHub laden', 'sync.forget':'✗ Token löschen', 'sync.zip':'↥ Backup als ZIP'
         }
       };
       const ruDeText = {
@@ -2089,7 +2154,8 @@
         if (action === 'reset-idea-filters') { if ($('#idea-search')) $('#idea-search').value = ''; if ($('#idea-status-filter')) $('#idea-status-filter').value = 'all'; activeFolder = 'all'; renderIdeas(); }
         if (action === 'close-modal') closeModal();
         if (action === 'add-check') addChecklistItem();
-        if (action === 'gh-save') { saveGhConfig($('#gh-owner').value, $('#gh-repo').value, $('#gh-branch').value, $('#gh-token').value); $('#gh-token').value = ''; setSyncStatus(lang === 'de' ? 'Zugang gespeichert' : 'Доступ сохранён'); }
+        if (action === 'gh-save') { saveGhConfig($('#gh-owner').value, $('#gh-repo').value, $('#gh-branch').value, $('#gh-token').value); $('#gh-token').value = ''; setSyncStatus(lang === 'de' ? 'Zugang gespeichert' : 'Доступ сохранён'); ghCheck(); }
+        if (action === 'gh-check') ghCheck();
         if (action === 'gh-push') ghPush();
         if (action === 'gh-pull') ghPull();
         if (action === 'gh-forget') forgetGh();
