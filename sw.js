@@ -1,4 +1,4 @@
-const CACHE = 'social-desk-v18-2';
+const CACHE = 'social-desk-v19-1';
 const ASSETS = [
   './',
   './index.html',
